@@ -41,8 +41,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AgentBehaviors\MaxDisplacementBehavior.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StructuralAnalysis\FEM.cs" />
+    <Compile Include="Solver\Solver.cs" />
+    <Compile Include="StructuralAnalysis\FEA.cs" />
+    <Compile Include="StructuralModelling\Beam.cs" />
+    <Compile Include="StructuralModelling\Slab.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

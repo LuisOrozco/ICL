@@ -1,13 +1,12 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ICL.Core.StructuralAnalysis
+namespace ICL.Core.StructuralModelling
 {
-    internal class FEM
+    internal class Slab
     {
     }
 }

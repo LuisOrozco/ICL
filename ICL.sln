@@ -5,7 +5,7 @@ VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICL.Core", "ICL.Core\ICL.Core.csproj", "{829A57E3-C40F-4B70-851A-EF27128E5048}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICL.GH", "ICL.GH\ICL.GH.csproj", "{0BCAE5EC-30D2-4791-8BD9-B7709621866A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ICL.GH", "ICL.GH\ICL.GH.csproj", "{0BCAE5EC-30D2-4791-8BD9-B7709621866A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

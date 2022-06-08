@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using Grasshopper.Kernel;
 using Rhino.Geometry;
+using ICL.Core.Solver;
 
 namespace ICL.GH
 {
@@ -12,9 +13,9 @@ namespace ICL.GH
         /// Initializes a new instance of the MyComponent1 class.
         /// </summary>
         public MyComponent1()
-          : base("MyComponent1", "Nickname",
+          : base("BeamSolver", "solver",
               "Description",
-              "Category", "Subcategory")
+              "ICL", "ICL Core")
         {
         }
 
@@ -23,6 +24,7 @@ namespace ICL.GH
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
+            pManager.AddGenericParameter("testString", "S", "test String", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -30,6 +32,7 @@ namespace ICL.GH
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
+            pManager.AddGenericParameter("Display Test", "T", "Display Text", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -38,6 +41,16 @@ namespace ICL.GH
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            string testString = "a";
+
+            if (!DA.GetData(0, ref testString)) return;
+
+            BeamSolver outString = new BeamSolver("hello");
+            string outTest = outString.ConcatString("hello");
+
+            DA.SetData(0, outTest);
+            //outString.ConcatString("hello");
+
         }
 
         /// <summary>

@@ -10,28 +10,22 @@ namespace ICL.Core.Solver
     internal class NamespaceDoc { }
 
     public class BeamSolver
-    {
-        public string test;
+    {   
+        ///the assembly part
+        ///This is an assembly class 
+        ///call agent: sets agent start position  
+        ///call environment call: sets start enevironment position
+        ///call agent system 
 
-        public BeamSolver(string names)
-        {
-            test = names;
-        }
-
-        public string ConcatString(string name)
-        {
-            string test2 = name + "test";
-            return test2;
-        }
-
-        static void Main(string[] args)
-        {
-            BeamSolver testA = new BeamSolver("Hello");
-            RhinoApp.WriteLine(testA + "check Output");
-        }
-        //call maxdisplacementBehaviour(get string)
-        //call FEA (get string)
-        //call beam (get string)
-        //return (concatinated strings)
+        ///method solver
+        ///make single-step-solver
+        ///preexecute
+        ///execute
+        ///postexecute
+        ///addandremoveagents 
+        ///call FEM
+        ///callFEA
+        ///update environment
+        
     }
 }

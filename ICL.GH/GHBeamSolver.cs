@@ -7,15 +7,15 @@ using ICL.Core.Solver;
 
 namespace ICL.GH
 {
-    public class MyComponent1 : GH_Component
+    public class GHBeamSolver : GH_Component
     {
         /// <summary>
         /// Initializes a new instance of the MyComponent1 class.
         /// </summary>
-        public MyComponent1()
+        public GHBeamSolver()
           : base("BeamSolver", "solver",
               "Description",
-              "ICL", "ICL Core")
+              "Curve", "Primitive")
         {
         }
 
@@ -56,6 +56,7 @@ namespace ICL.GH
         /// <summary>
         /// Provides an Icon for the component.
         /// </summary>
+        public override GH_Exposure Exposure => GH_Exposure.primary;
         protected override System.Drawing.Bitmap Icon
         {
             get

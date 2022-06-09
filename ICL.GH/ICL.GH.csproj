@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net452</TargetFramework>
     <Version>1.0</Version>
     <Title>ICL.GH</Title>
     <Description>Description of ICL.GH</Description>
@@ -9,7 +9,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Grasshopper" Version="7.13.21348.13001" IncludeAssets="compile;build" />
+    <PackageReference Include="Grasshopper" Version="6.35.21222.17001" IncludeAssets="compile;build" />
   </ItemGroup>
   
   <ItemGroup>

@@ -30,6 +30,19 @@ namespace ICL.Core.StructuralModelling
             this.Material = material;
         }
         ///create Beam element 
+
+        public void computeFEM()
+        {
+            ///KarambaLine
+            ///KarambaSupport points
+            ///make KarambaLine to Curve
+            ///make nodes list 
+            ///divide the line and get the param of the dividsion to input into the BeamDisplacements component
+            ///make BeamToLine
+
+            ///Material 
+
+        }
         ///material definition
         ///load definition
         ///support definition

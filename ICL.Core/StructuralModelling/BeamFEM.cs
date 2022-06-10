@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace ICL.Core.StructuralModelling
 {
-    internal class Slab
+    public class BeamFEM
     {
+        public string colour = "red";
     }
 }

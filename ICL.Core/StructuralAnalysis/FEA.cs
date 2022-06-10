@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace ICL.Core.StructuralAnalysis
 {
-    internal class FEA
+    public class FEA
     {
+        public string colour = "green";
     }
 }

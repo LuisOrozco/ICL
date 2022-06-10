@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Rhino.Geometry;
+using System.Collections.Generic;
+using ICL.Core.StructuralModelling;
+using ICL.Core.StructuralAnalysis;
 
 namespace ICL.Core.Environment
 {
@@ -28,6 +31,30 @@ namespace ICL.Core.Environment
             this.EnvironmentBoundary = environmentBoundary;
         }
 
+        ///Method:0 reset the environment
+        public void Reset()
+        {
+            this.AgentPositions = this.AgentStartPositons;
+            NodalDisplacement.Clear();
+        }
+
+        //Method1: PreExecute 
+        public void PreExecute()
+        {
+            NodalDisplacement.Clear();
+        }
+
+        //Method2: Execute
+        public string Execute()
+        {
+            //call FEM 
+            BeamFEM createBeamEnvironmentFEM = new BeamFEM();
+
+            //call FEA 
+            FEA analyse = new FEA();
+
+            return analyse.colour + createBeamEnvironmentFEM.colour;
+        }
 
     }
 }

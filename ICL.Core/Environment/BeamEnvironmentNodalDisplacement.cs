@@ -24,11 +24,19 @@ namespace ICL.Core.Environment
         ///beam environment boundary points
         public List<Point3d> EnvironmentBoundary = new List<Point3d>();
 
+        ///beam environment loads
+        public List<string> BeamLoads = new List<string>();
+
+        ///beam environment material
+        public List<string> BeamMaterial = new List<string>();
+
         ///new instance of EnvironmentNodalNodalDisplacement
-        public BeamEnvironmentNodalDisplacement(List<Point3d> agentPositions, List<Point3d> environmentBoundary)
+        public BeamEnvironmentNodalDisplacement(List<Point3d> agentPositions, List<Point3d> environmentBoundary, List<string> beamLoads, List<string> beamMaterial)
         {
             this.AgentStartPositons = this.AgentPositions = agentPositions;
             this.EnvironmentBoundary = environmentBoundary;
+            this.BeamLoads = beamLoads;
+            this.BeamMaterial = beamMaterial;
         }
 
         ///Method:0 reset the environment
@@ -45,15 +53,17 @@ namespace ICL.Core.Environment
         }
 
         //Method2: Execute
-        public string Execute()
+        public BeamFEM Execute()
         {
             //call FEM 
-            BeamFEM createBeamEnvironmentFEM = new BeamFEM();
+            BeamFEM createBeamEnvironmentFEM = new BeamFEM(this.EnvironmentBoundary, this.AgentPositions, this.BeamLoads, this.BeamMaterial[0]);
+
 
             //call FEA 
             FEA analyse = new FEA();
 
-            return analyse.colour + createBeamEnvironmentFEM.colour;
+            return createBeamEnvironmentFEM;
+
         }
 
     }

@@ -4,16 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Rhino.Geometry;
-using System.Collections.Generic;
 using ICL.Core.StructuralModelling;
 using ICL.Core.StructuralAnalysis;
+using Karamba.Geometry;
 
 namespace ICL.Core.Environment
 {
     public class BeamEnvironmentNodalDisplacement
     {
         ///dict of  nodal displacements 
-        public Dictionary<double, Point3d> NodalDisplacement = new Dictionary<double, Point3d>();
+        public Dictionary<int, Point3d> NodalDisplacement = new Dictionary<int, Point3d>();
 
         ///list of positions of the agent 
         public List<Point3d> AgentPositions = new List<Point3d>();
@@ -42,7 +42,7 @@ namespace ICL.Core.Environment
         ///Method:0 reset the environment
         public void Reset()
         {
-            this.AgentPositions = this.AgentStartPositons;
+            //this.AgentPositions = this.AgentStartPositons;
             NodalDisplacement.Clear();
         }
 
@@ -53,16 +53,16 @@ namespace ICL.Core.Environment
         }
 
         //Method2: Execute
-        public BeamFEM Execute()
+        public double[] Execute()
         {
             //call FEM 
             BeamFEM createBeamEnvironmentFEM = new BeamFEM(this.EnvironmentBoundary, this.AgentPositions, this.BeamLoads, this.BeamMaterial[0]);
-
+            double[] lineTest = createBeamEnvironmentFEM.computeFEM();
 
             //call FEA 
-            FEA analyse = new FEA();
+            //FEA analyse = new FEA();
 
-            return createBeamEnvironmentFEM;
+            return lineTest;
 
         }
 

@@ -16,6 +16,12 @@
     <ProjectReference Include="..\ICL.Core\ICL.Core.csproj" />
   </ItemGroup>
   
+  <ItemGroup>
+    <Reference Include="Karamba3D">
+      <HintPath>..\..\..\AppData\Roaming\McNeel\Rhinoceros\packages\7.0\Karamba3D\2.2.0.12\karamba.gha</HintPath>
+    </Reference>
+  </ItemGroup>
+  
   <PropertyGroup Condition="$(Configuration) == 'Debug' AND $([MSBuild]::IsOSPlatform(Windows))">
     <StartProgram>C:\Program Files\Rhino 7\System\Rhino.exe</StartProgram>
     <StartArguments></StartArguments>

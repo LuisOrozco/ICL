@@ -7,6 +7,7 @@ using Rhino.Geometry;
 using ICL.Core.StructuralModelling;
 using ICL.Core.StructuralAnalysis;
 using Karamba.Geometry;
+using Karamba.Supports;
 
 namespace ICL.Core.Environment
 {
@@ -53,11 +54,11 @@ namespace ICL.Core.Environment
         }
 
         //Method2: Execute
-        public List<List<bool>> Execute()
+        public List<Support> Execute()
         {
             //call FEM 
             BeamFEM createBeamEnvironmentFEM = new BeamFEM(this.EnvironmentBoundary, this.AgentPositions, this.BeamLoads, this.BeamMaterial[0]);
-            List<List<bool>> lineTest = createBeamEnvironmentFEM.computeFEM();
+            List<Support> lineTest = createBeamEnvironmentFEM.computeFEM();
 
             //call FEA 
             //FEA analyse = new FEA();

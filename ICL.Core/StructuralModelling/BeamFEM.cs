@@ -11,6 +11,7 @@ using KarambaCommon;
 using Karamba.Supports;
 using Karamba.CrossSections;
 using Karamba.Utilities;
+using Rhino;
 
 namespace ICL.Core.StructuralModelling
 {
@@ -38,7 +39,7 @@ namespace ICL.Core.StructuralModelling
         }
         ///create Beam element 
 
-        public List<List<bool>> computeFEM()
+        public List<Support> computeFEM()
         {
             ///KarambaLine==========================================================================
             List<Line3> beamLineList = new List<Line3>();
@@ -85,13 +86,18 @@ namespace ICL.Core.StructuralModelling
 
             ///Supports & Loads
             List<List<bool>> supportConditions = CreateSupportCondition();
-
-            ///for number of agents create roller condition(function)
+            List<int> TparamIndexOfColumnPos = ComputeTparamIndexOfColumnPos(tParams);
+            List<Support> supports = new List<Support>();
+            for (int i = 0; i < supportConditions.Count; i++)
+            {
+                Support support = k3d.Support.Support(TparamIndexOfColumnPos[i], supportConditions[i]);
+                supports.Add(support);
+            }
             ///find where column is get param & idex of param on paramlist(function)
             ///create supports for every column param 
             ///make supports list 
 
-            return supportConditions;
+            return supports;
             //make line
             //List<tParam> divide curev and get the paramters of the curve division not the points 
             //Material definition
@@ -104,6 +110,38 @@ namespace ICL.Core.StructuralModelling
             ///Material 
 
         }
+        public List<int> ComputeTparamIndexOfColumnPos(double[] beamTparamList)
+        {
+            List<double> columnPosParam = new List<double>();
+            foreach (Point3d pt in this.columnPositions)
+            {
+                double t;
+                Line l = new Line(this.BeamLinePoints[0], this.BeamLinePoints[1]);
+                bool curveParam = l.ToNurbsCurve().ClosestPoint(pt, out t);
+                if (curveParam == true)
+                {
+                    columnPosParam.Add(t);
+                }
+                else
+                {
+                    RhinoApp.WriteLine("Column not connected to beam");
+                }
+            }
+            List<int> columnPosParamLocation = new List<int>();
+            foreach (double t in columnPosParam)
+            {
+                for (var i = 0; i < beamTparamList.Length; i++)
+                {
+                    if (t == beamTparamList[i])
+                    {
+                        columnPosParamLocation.Add(i);
+                    }
+                }
+            }
+            return columnPosParamLocation;
+        }
+
+
         public List<List<bool>> CreateSupportCondition()
         {
             List<List<bool>> conditions = new List<List<bool>>();

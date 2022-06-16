@@ -53,11 +53,11 @@ namespace ICL.Core.Environment
         }
 
         //Method2: Execute
-        public double[] Execute()
+        public List<List<bool>> Execute()
         {
             //call FEM 
             BeamFEM createBeamEnvironmentFEM = new BeamFEM(this.EnvironmentBoundary, this.AgentPositions, this.BeamLoads, this.BeamMaterial[0]);
-            double[] lineTest = createBeamEnvironmentFEM.computeFEM();
+            List<List<bool>> lineTest = createBeamEnvironmentFEM.computeFEM();
 
             //call FEA 
             //FEA analyse = new FEA();

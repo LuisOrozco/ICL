@@ -38,7 +38,7 @@ namespace ICL.Core.StructuralModelling
         }
         ///create Beam element 
 
-        public double[] computeFEM()
+        public List<List<bool>> computeFEM()
         {
             ///KarambaLine==========================================================================
             List<Line3> beamLineList = new List<Line3>();
@@ -83,7 +83,15 @@ namespace ICL.Core.StructuralModelling
             var nodes = new List<Point3>();
             var elems = k3d.Part.LineToBeam(beamLineList, new List<string>() { "Be0" }, croSecList, logger, out nodes);
 
-            return tParams;
+            ///Supports & Loads
+            List<List<bool>> supportConditions = CreateSupportCondition();
+
+            ///for number of agents create roller condition(function)
+            ///find where column is get param & idex of param on paramlist(function)
+            ///create supports for every column param 
+            ///make supports list 
+
+            return supportConditions;
             //make line
             //List<tParam> divide curev and get the paramters of the curve division not the points 
             //Material definition
@@ -96,7 +104,16 @@ namespace ICL.Core.StructuralModelling
             ///Material 
 
         }
-
+        public List<List<bool>> CreateSupportCondition()
+        {
+            List<List<bool>> conditions = new List<List<bool>>();
+            foreach (Point3d pt in this.columnPositions)
+            {
+                List<bool> cond = new List<bool>() { false, true, true, false, false, false };
+                conditions.Add(cond);
+            }
+            return conditions;
+        }
         public double[] FindBeamCurveParameters()
         {
 

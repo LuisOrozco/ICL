@@ -8,6 +8,9 @@ using Rhino.Geometry;
 using Karamba;
 using Karamba.Geometry;
 using KarambaCommon;
+using Karamba.Supports;
+using Karamba.CrossSections;
+using Karamba.Utilities;
 
 namespace ICL.Core.StructuralModelling
 {
@@ -60,6 +63,25 @@ namespace ICL.Core.StructuralModelling
             Karamba.Materials.FemMaterial.FlowHypothesis.mises,
             1e-4,
             null);
+
+            ///CrossSection=========================================================================
+            List<CroSec> croSecList = new List<CroSec>();
+            CroSec_Trapezoid trapCroSec = new CroSec_Trapezoid(
+            "Beam",
+            "BeamCrossSection",
+            null,
+            null,
+            materials,
+            30,
+            100,
+            100);
+            croSecList.Add(trapCroSec);
+
+            ///Build LineToBeam element=============================================================
+            var k3d = new KarambaCommon.Toolkit();
+            var logger = new MessageLogger();
+            var nodes = new List<Point3>();
+            var elems = k3d.Part.LineToBeam(beamLineList, new List<string>() { "Be0" }, croSecList, logger, out nodes);
 
             return tParams;
             //make line

@@ -8,6 +8,12 @@ using ICL.Core.StructuralModelling;
 using ICL.Core.StructuralAnalysis;
 using Karamba.Geometry;
 using Karamba.Supports;
+using Karamba.Models;
+using Karamba.CrossSections;
+using Karamba.Elements;
+using Karamba.Loads;
+
+
 
 namespace ICL.Core.Environment
 {
@@ -54,16 +60,16 @@ namespace ICL.Core.Environment
         }
 
         //Method2: Execute
-        public List<Support> Execute()
+        public List<Line3> Execute()
         {
             //call FEM 
             BeamFEM createBeamEnvironmentFEM = new BeamFEM(this.EnvironmentBoundary, this.AgentPositions, this.BeamLoads, this.BeamMaterial[0]);
-            List<Support> lineTest = createBeamEnvironmentFEM.computeFEM();
+            //Model lineTest = createBeamEnvironmentFEM.ComputeFEM();
+            List<Line3> sortingTest = createBeamEnvironmentFEM.ComputeBeamLineSegments();
 
-            //call FEA 
-            //FEA analyse = new FEA();
 
-            return lineTest;
+
+            return sortingTest;
 
         }
 

@@ -11,8 +11,15 @@ using KarambaCommon;
 using Karamba.Supports;
 using Karamba.CrossSections;
 using Karamba.Utilities;
+using Karamba.Loads;
+using Karamba.Models;
+using Karamba.Results;
+using Karamba.Nodes;
+using Karamba.Elements;
 using Rhino;
-
+/// <summary>
+/// do the FEM parrt like you used to
+/// </summary>
 namespace ICL.Core.StructuralModelling
 {
     public class BeamFEM
@@ -39,7 +46,7 @@ namespace ICL.Core.StructuralModelling
         }
         ///create Beam element 
 
-        public List<Support> computeFEM()
+        public Model ComputeFEM()
         {
             ///KarambaLine==========================================================================
             List<Line3> beamLineList = new List<Line3>();
@@ -51,7 +58,7 @@ namespace ICL.Core.StructuralModelling
 
             double[] tParams = FindBeamCurveParameters();
 
-            //Material definition
+            ///Material definition==================================================================
             Karamba.Materials.FemMaterial_Isotrop materials = new Karamba.Materials.FemMaterial_Isotrop(
             "family",
             "name",
@@ -73,7 +80,7 @@ namespace ICL.Core.StructuralModelling
             null,
             null,
             materials,
-            30,
+            30,//has to be parameterised
             100,
             100);
             croSecList.Add(trapCroSec);
@@ -82,32 +89,185 @@ namespace ICL.Core.StructuralModelling
             var k3d = new KarambaCommon.Toolkit();
             var logger = new MessageLogger();
             var nodes = new List<Point3>();
-            var elems = k3d.Part.LineToBeam(beamLineList, new List<string>() { "Be0" }, croSecList, logger, out nodes);
+            List<BuilderBeam> elems = k3d.Part.LineToBeam(beamLineList, new List<string>() { "Be0" }, croSecList, logger, out nodes);
 
-            ///Supports & Loads
+            ///Supports & Loads======================================================================
             List<List<bool>> supportConditions = CreateSupportCondition();
             List<int> TparamIndexOfColumnPos = ComputeTparamIndexOfColumnPos(tParams);
             List<Support> supports = new List<Support>();
+            Line l = new Line(this.BeamLinePoints[0], this.BeamLinePoints[1]);
             for (int i = 0; i < supportConditions.Count; i++)
             {
-                Support support = k3d.Support.Support(TparamIndexOfColumnPos[i], supportConditions[i]);
+                int index = TparamIndexOfColumnPos[i];
+                Point3d pt = l.PointAt(index);
+                Point3 ptPos = new Point3(pt[0], pt[1], pt[2]);
+                Support support = k3d.Support.Support(ptPos, supportConditions[i]);
                 supports.Add(support);
             }
-            ///find where column is get param & idex of param on paramlist(function)
-            ///create supports for every column param 
-            ///make supports list 
 
-            return supports;
-            //make line
-            //List<tParam> divide curev and get the paramters of the curve division not the points 
-            //Material definition
-            ///KarambaSupport points
-            //based on agent position get the tParam(make be this is a function)
-            ///make KarambaLine to Curve
-            ///make nodes list 
-            ///divide the line and get the param of the dividsion to input into the BeamDisplacements component
-            ///make BeamToLine
-            ///Material 
+            ///Loads==========================================================================
+            var gLoad = k3d.Load.GravityLoad(new Vector3(0, 0, -1));
+            var testUdl = k3d.Load.ConstantForceLoad(Vector3.UnitZ * -1, 10);
+            List<Load> loads = new List<Load>() { gLoad, testUdl };
+
+            ///Model==========================================================================
+            double mass;
+            Point3 cog;
+            bool flag;
+            string info;
+            Model model = k3d.Model.AssembleModel(
+            elems,
+            supports,
+            loads,
+            out info,
+            out mass,
+            out cog,
+            out info,
+            out flag);
+
+            /////Analyse==========================================================================
+            //List<double> max_disp;
+            //List<double> out_g;
+            //List<double> out_comp;
+            //string message;
+            //model = k3d.Algorithms.AnalyzeThI(model, out max_disp, out out_g, out out_comp, out message);
+
+            /////NodalDisplacements
+            //model = model.Clone();
+            //model.cloneElements();
+            //string lc_ind = "0";
+            //List<int> ids = ComputeNodeIDs(tParams);
+            //var trans = new List<List<Vector3>>();
+            //var rotat = new List<List<Vector3>>();
+            //NodalDisp.solve(model, lc_ind, ids, out trans, out rotat);
+
+            return model;
+
+        }
+        public List<Line3> ComputeBeamLineSegments()
+        {
+            Point3d startPoint = this.BeamLinePoints[0];
+            Point3d endPoint = this.BeamLinePoints[1];
+
+            //sort points 
+            List<Point3d> sortedColumnPositions = SortListOfPoint3d(this.columnPositions);
+            List<Point3d> sortedBeamLinePoints = SortListOfPoint3d(this.BeamLinePoints);
+            bool pointAtStart = false;
+            bool pointAtEnd = false;
+
+            //check if any of the columns are at the start or end position of the beam
+            foreach (Point3d point in sortedColumnPositions)
+            {
+                if (sortedBeamLinePoints[0] == point)
+                {
+                    pointAtStart = true;
+                }
+                else if (sortedBeamLinePoints[1] == point)
+                {
+                    pointAtEnd = true;
+                }
+            }
+
+            //make list of beam lines
+            List<Line3> lineSegments = new List<Line3>();
+            if (pointAtStart == true && pointAtEnd == true)
+            {
+                List<List<Point3d>> pointGroups = slidingWindowIterator(sortedColumnPositions);
+                List<Line3> lines = LinesFromNestedPointPairs(pointGroups);
+                foreach (Line3 l in lines)
+                {
+                    lineSegments.Add(l);
+                }
+            }
+            else if (pointAtStart == false && pointAtEnd == true)
+            {
+                List<Point3d> sortedColumnPosDup = new List<Point3d>(sortedColumnPositions);
+                sortedColumnPosDup.Insert(0, sortedBeamLinePoints[0]);
+                List<List<Point3d>> pointGroups = slidingWindowIterator(sortedColumnPosDup);
+
+                List<Line3> lines = LinesFromNestedPointPairs(pointGroups);
+                foreach (Line3 l in lines)
+                {
+                    lineSegments.Add(l);
+                }
+            }
+
+            else if (pointAtStart == true && pointAtEnd == false)
+            {
+                //add end point of this.beamlinepoints and make sliding window
+                List<Point3d> sortedColumnPosDup = new List<Point3d>(sortedColumnPositions);
+                sortedColumnPosDup.Insert(sortedColumnPosDup.Count, sortedBeamLinePoints[1]);
+                List<List<Point3d>> pointGroups = slidingWindowIterator(sortedColumnPosDup);
+
+                List<Line3> lines = LinesFromNestedPointPairs(pointGroups);
+                foreach (Line3 l in lines)
+                {
+                    lineSegments.Add(l);
+                }
+            }
+            else if (pointAtStart == false && pointAtEnd == false)
+            {
+                //add start and end point to a temp list and make sliding widnow
+                List<Point3d> sortedColumnPosDup = new List<Point3d>(sortedColumnPositions);
+                sortedColumnPosDup.Insert(0, sortedBeamLinePoints[0]);
+                sortedColumnPosDup.Insert(sortedColumnPosDup.Count, sortedBeamLinePoints[1]);
+                List<List<Point3d>> pointGroups = slidingWindowIterator(sortedColumnPosDup);
+
+                List<Line3> lines = LinesFromNestedPointPairs(pointGroups);
+                foreach (Line3 l in lines)
+                {
+                    lineSegments.Add(l);
+                }
+            }
+
+            return lineSegments;
+
+        }
+
+        public List<Line3> LinesFromNestedPointPairs(List<List<Point3d>> pointGroups)
+        {
+            List<Line3> lineSegments = new List<Line3>();
+            foreach (var ptPairs in pointGroups)
+            {
+                Line3 line = new Line3(new Point3(ptPairs[0][0], ptPairs[0][1], ptPairs[0][2]), new Point3(ptPairs[1][0], ptPairs[1][1], ptPairs[1][2]));
+                lineSegments.Add(line);
+            }
+            return lineSegments;
+        }
+        public List<Point3d> SortListOfPoint3d(List<Point3d> pointsToSort)
+        {
+            List<Point3d> sortedPoints = new List<Point3d>();
+            Point3d[] point3dArray = pointsToSort.ToArray();
+            Array.Sort(point3dArray);
+            foreach (Point3d pt in point3dArray)
+            {
+                sortedPoints.Add(pt);
+            }
+            return sortedPoints;
+        }
+        public List<List<Point3d>> slidingWindowIterator(List<Point3d> pointsToIterate)
+        {
+            //sliding window iteration
+            List<List<Point3d>> iterationGroups = new List<List<Point3d>>();
+
+            for (int i = 0; i < pointsToIterate.Count - 1; i++)
+            {
+                List<Point3d> inputNest = new List<Point3d>();
+                inputNest.Add(pointsToIterate[i]);
+                inputNest.Add(pointsToIterate[i + 1]);
+                iterationGroups.Add(inputNest);
+
+            }
+            return iterationGroups;
+        }
+        public List<int> ComputeNodeIDs(double[] nodeParams)
+        {
+            List<int> ids = new List<int>();
+            for (int i = 0; i < nodeParams.Length; i++)
+            {
+                ids.Add(i);
+            }
+            return ids;
 
         }
         public List<int> ComputeTparamIndexOfColumnPos(double[] beamTparamList)
@@ -127,12 +287,28 @@ namespace ICL.Core.StructuralModelling
                     RhinoApp.WriteLine("Column not connected to beam");
                 }
             }
+
             List<int> columnPosParamLocation = new List<int>();
-            foreach (double t in columnPosParam)
+            foreach (double ct in columnPosParam)
             {
+                List<double> distances = new List<double>();
+                foreach (double bt in beamTparamList)
+                {
+                    Line l = new Line(this.BeamLinePoints[0], this.BeamLinePoints[1]);
+                    Point3d pt1 = l.PointAt(bt);
+                    Point3d pt2 = l.PointAt(ct);
+                    double dist = pt1.DistanceTo(pt2);
+                    distances.Add(dist);
+                }
+                double minDistance = distances.Min();
+
                 for (var i = 0; i < beamTparamList.Length; i++)
                 {
-                    if (t == beamTparamList[i])
+                    Line l = new Line(this.BeamLinePoints[0], this.BeamLinePoints[1]);
+                    Point3d pt1 = l.PointAt(beamTparamList[i]);
+                    Point3d pt2 = l.PointAt(ct);
+                    double dist = pt1.DistanceTo(pt2);
+                    if (dist == minDistance)
                     {
                         columnPosParamLocation.Add(i);
                     }
@@ -141,11 +317,10 @@ namespace ICL.Core.StructuralModelling
             return columnPosParamLocation;
         }
 
-
         public List<List<bool>> CreateSupportCondition()
         {
             List<List<bool>> conditions = new List<List<bool>>();
-            foreach (Point3d pt in this.columnPositions)
+            for (int i = 0; i < this.columnPositions.Count; i++)
             {
                 List<bool> cond = new List<bool>() { false, true, true, false, false, false };
                 conditions.Add(cond);

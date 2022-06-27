@@ -25,18 +25,13 @@ namespace ICL.Core.StructuralModelling
     public class BeamFEM
     {
         ///public attributes
-
         public double divisionLength = 0.5;//in mm
         public List<Point3d> BeamLinePoints = new List<Point3d>();
         public List<Point3d> columnPositions = new List<Point3d>();
         public List<string> BeamLoadTypes = new List<string>();
         public Dictionary<int, Point3d> NodalDisplacement = new Dictionary<int, Point3d>();
         public string Material;
-        ///Beam element 
-        ///material
-        ///load
-        ///support
-        ///model
+
         public BeamFEM(List<Point3d> beamLinePoints, List<Point3d> columnPositions, List<string> beamLoadTypes, string material)
         {
             this.BeamLinePoints = beamLinePoints;
@@ -50,7 +45,7 @@ namespace ICL.Core.StructuralModelling
         {
             ///KarambaLine==========================================================================
             List<Line3> beamLineList = new List<Line3>();
-
+            List<Line3> testBeamLineList = ComputeBeamLineSegments();
             Point3 pStart = new Point3(this.BeamLinePoints[0][0], this.BeamLinePoints[0][1], this.BeamLinePoints[0][2]);
             Point3 pEnd = new Point3(this.BeamLinePoints[1][0], this.BeamLinePoints[1][1], this.BeamLinePoints[1][2]);
             Line3 beamLine = new Line3(pStart, pEnd);
@@ -84,24 +79,28 @@ namespace ICL.Core.StructuralModelling
             100,
             100);
             croSecList.Add(trapCroSec);
+            //<summary> adding cross section definition for each line segment o fthe beam </summary>
+            foreach (Line3 segment in testBeamLineList)
+            {
+                croSecList.Add(trapCroSec);
+            }
 
             ///Build LineToBeam element=============================================================
             var k3d = new KarambaCommon.Toolkit();
             var logger = new MessageLogger();
             var nodes = new List<Point3>();
-            List<BuilderBeam> elems = k3d.Part.LineToBeam(beamLineList, new List<string>() { "Be0" }, croSecList, logger, out nodes);
+            List<BuilderBeam> elems = k3d.Part.LineToBeam(testBeamLineList, new List<string>() { "Be0" }, croSecList, logger, out nodes);
 
             ///Supports & Loads======================================================================
             List<List<bool>> supportConditions = CreateSupportCondition();
             List<int> TparamIndexOfColumnPos = ComputeTparamIndexOfColumnPos(tParams);
             List<Support> supports = new List<Support>();
-            Line l = new Line(this.BeamLinePoints[0], this.BeamLinePoints[1]);
-            for (int i = 0; i < supportConditions.Count; i++)
+            //Line l = new Line(this.BeamLinePoints[0], this.BeamLinePoints[1]);
+            for (int i = 0; i < this.columnPositions.Count; i++)
             {
-                int index = TparamIndexOfColumnPos[i];
-                Point3d pt = l.PointAt(index);
-                Point3 ptPos = new Point3(pt[0], pt[1], pt[2]);
-                Support support = k3d.Support.Support(ptPos, supportConditions[i]);
+                Point3 nodePt = new Point3(this.columnPositions[i][0], this.columnPositions[i][1], this.columnPositions[i][2]);
+                RhinoApp.WriteLine(nodePt + "nodePt");
+                Support support = k3d.Support.Support(nodePt, supportConditions[i]);
                 supports.Add(support);
             }
 
@@ -125,7 +124,7 @@ namespace ICL.Core.StructuralModelling
             out info,
             out flag);
 
-            /////Analyse==========================================================================
+            ///Analyse==========================================================================
             //List<double> max_disp;
             //List<double> out_g;
             //List<double> out_comp;
@@ -144,18 +143,23 @@ namespace ICL.Core.StructuralModelling
             return model;
 
         }
+        /// <summary>
+        /// Method for computing the line segments that make up a beam (affected by column positions)
+        /// </summary>
+        /// <returns> List<Line3> a list of karamba Line3 </Line3></returns>
         public List<Line3> ComputeBeamLineSegments()
         {
-            Point3d startPoint = this.BeamLinePoints[0];
-            Point3d endPoint = this.BeamLinePoints[1];
-
-            //sort points 
+            /// <summary>
+            /// sort all list of points
+            /// </summary>
             List<Point3d> sortedColumnPositions = SortListOfPoint3d(this.columnPositions);
             List<Point3d> sortedBeamLinePoints = SortListOfPoint3d(this.BeamLinePoints);
             bool pointAtStart = false;
             bool pointAtEnd = false;
 
-            //check if any of the columns are at the start or end position of the beam
+            /// <summary>
+            /// check for columns at the start and end of the beam
+            /// </summary>
             foreach (Point3d point in sortedColumnPositions)
             {
                 if (sortedBeamLinePoints[0] == point)
@@ -168,7 +172,9 @@ namespace ICL.Core.StructuralModelling
                 }
             }
 
-            //make list of beam lines
+            /// <summary>
+            /// create list of beam line elements as a Karamba Line3 element
+            /// </summary>
             List<Line3> lineSegments = new List<Line3>();
             if (pointAtStart == true && pointAtEnd == true)
             {
@@ -194,7 +200,6 @@ namespace ICL.Core.StructuralModelling
 
             else if (pointAtStart == true && pointAtEnd == false)
             {
-                //add end point of this.beamlinepoints and make sliding window
                 List<Point3d> sortedColumnPosDup = new List<Point3d>(sortedColumnPositions);
                 sortedColumnPosDup.Insert(sortedColumnPosDup.Count, sortedBeamLinePoints[1]);
                 List<List<Point3d>> pointGroups = slidingWindowIterator(sortedColumnPosDup);
@@ -207,7 +212,6 @@ namespace ICL.Core.StructuralModelling
             }
             else if (pointAtStart == false && pointAtEnd == false)
             {
-                //add start and end point to a temp list and make sliding widnow
                 List<Point3d> sortedColumnPosDup = new List<Point3d>(sortedColumnPositions);
                 sortedColumnPosDup.Insert(0, sortedBeamLinePoints[0]);
                 sortedColumnPosDup.Insert(sortedColumnPosDup.Count, sortedBeamLinePoints[1]);
@@ -224,6 +228,11 @@ namespace ICL.Core.StructuralModelling
 
         }
 
+        /// <summary>
+        /// Method for creating a Karamba Line3 element form a nested list of point3d elements
+        /// </summary>
+        /// <param> List of List of Point3d elements: groups of points </param>
+        /// <returns> List<Line3> a list of karamba Line3 </returns>
         public List<Line3> LinesFromNestedPointPairs(List<List<Point3d>> pointGroups)
         {
             List<Line3> lineSegments = new List<Line3>();
@@ -234,6 +243,12 @@ namespace ICL.Core.StructuralModelling
             }
             return lineSegments;
         }
+
+        /// <summary>
+        /// Method for sorting list of point3d elements in assending order
+        /// </summary>
+        /// <param> List of Point3d elements: groups of points </param>
+        /// <returns> List<Point3d> </returns>
         public List<Point3d> SortListOfPoint3d(List<Point3d> pointsToSort)
         {
             List<Point3d> sortedPoints = new List<Point3d>();
@@ -245,9 +260,14 @@ namespace ICL.Core.StructuralModelling
             }
             return sortedPoints;
         }
+
+        /// <summary>
+        /// Method creating a sliding window iterator for list of point3d
+        /// </summary>
+        /// <param> List of Point3d elements: groups of points </param>
+        /// <returns> List<List<Point3d>> </returns>
         public List<List<Point3d>> slidingWindowIterator(List<Point3d> pointsToIterate)
         {
-            //sliding window iteration
             List<List<Point3d>> iterationGroups = new List<List<Point3d>>();
 
             for (int i = 0; i < pointsToIterate.Count - 1; i++)
@@ -260,6 +280,12 @@ namespace ICL.Core.StructuralModelling
             }
             return iterationGroups;
         }
+
+        /// <summary>
+        /// Method to compute node IDs
+        /// </summary>
+        /// <param> double[]: array of doubles </param>
+        /// <returns> List<int> </int> </returns>
         public List<int> ComputeNodeIDs(double[] nodeParams)
         {
             List<int> ids = new List<int>();
@@ -268,8 +294,13 @@ namespace ICL.Core.StructuralModelling
                 ids.Add(i);
             }
             return ids;
-
         }
+
+        /// <summary>
+        /// Methos to compute the parameter of a Point3d on a Curve
+        /// </summary>
+        /// <param> double[]: array of double </param>
+        /// <returns> List<int> </returns>
         public List<int> ComputeTparamIndexOfColumnPos(double[] beamTparamList)
         {
             List<double> columnPosParam = new List<double>();
@@ -317,6 +348,10 @@ namespace ICL.Core.StructuralModelling
             return columnPosParamLocation;
         }
 
+        /// <summary>
+        /// Method creating Kasramba support conditions
+        /// </summary>
+        /// <returns> List<List<bool>> </returns>
         public List<List<bool>> CreateSupportCondition()
         {
             List<List<bool>> conditions = new List<List<bool>>();
@@ -327,9 +362,13 @@ namespace ICL.Core.StructuralModelling
             }
             return conditions;
         }
+
+        /// <summary>
+        /// Method to compute beamline divisions and their respective paramters
+        /// </summary>
+        /// <returns> double[]: an array of doubles containing beam curve paramters at node points </returns>
         public double[] FindBeamCurveParameters()
         {
-
             Line line = new Line(this.BeamLinePoints[0], this.BeamLinePoints[1]);
             double lineLength = line.Length;
             int nCount = Convert.ToInt32(Math.Round(lineLength / divisionLength));

@@ -25,12 +25,13 @@ namespace ICL.Core.StructuralModelling
     public class BeamFEM
     {
         ///public attributes
-        public double divisionLength = 0.5;//in mm
+        public double divisionLength = 100;//in mm
         public List<Point3d> BeamLinePoints = new List<Point3d>();
         public List<Point3d> columnPositions = new List<Point3d>();
         public List<string> BeamLoadTypes = new List<string>();
         public Dictionary<int, Point3d> NodalDisplacement = new Dictionary<int, Point3d>();
         public string Material;
+        //public List<Point3> Nodes = new List<Point3>();
 
         public BeamFEM(List<Point3d> beamLinePoints, List<Point3d> columnPositions, List<string> beamLoadTypes, string material)
         {
@@ -40,19 +41,20 @@ namespace ICL.Core.StructuralModelling
             this.Material = material;
         }
         ///create Beam element 
-
-        public Model ComputeFEM()
+        public Model ComputeFEM(ref List<Point3> dispNodes)
         {
             ///KarambaLine==========================================================================
-            List<Line3> beamLineList = new List<Line3>();
-            List<Line3> testBeamLineList = ComputeBeamLineSegments();
-            Point3 pStart = new Point3(this.BeamLinePoints[0][0], this.BeamLinePoints[0][1], this.BeamLinePoints[0][2]);
-            Point3 pEnd = new Point3(this.BeamLinePoints[1][0], this.BeamLinePoints[1][1], this.BeamLinePoints[1][2]);
-            Line3 beamLine = new Line3(pStart, pEnd);
-            beamLineList.Add(beamLine);
-
-            double[] tParams = FindBeamCurveParameters();
-
+            List<Line3> beamLine = ComputeBeamLineSegments();
+            List<Point3> beamElementsNodes = ComputeNodeDivisions(beamLine);
+            foreach (Point3 pt in beamElementsNodes)
+            {
+                dispNodes.Add(pt);
+            }
+            List<Line3> beamLineElems = ComputeBeamLineElems(beamElementsNodes);
+            foreach (Line3 l in beamLineElems)
+            {
+                RhinoApp.WriteLine(l + "test");
+            }
             ///Material definition==================================================================
             Karamba.Materials.FemMaterial_Isotrop materials = new Karamba.Materials.FemMaterial_Isotrop(
             "family",
@@ -80,7 +82,7 @@ namespace ICL.Core.StructuralModelling
             100);
             croSecList.Add(trapCroSec);
             //<summary> adding cross section definition for each line segment o fthe beam </summary>
-            foreach (Line3 segment in testBeamLineList)
+            foreach (Line3 segment in beamLineElems)
             {
                 croSecList.Add(trapCroSec);
             }
@@ -89,17 +91,20 @@ namespace ICL.Core.StructuralModelling
             var k3d = new KarambaCommon.Toolkit();
             var logger = new MessageLogger();
             var nodes = new List<Point3>();
-            List<BuilderBeam> elems = k3d.Part.LineToBeam(testBeamLineList, new List<string>() { "Be0" }, croSecList, logger, out nodes);
+            List<string> elmIds = new List<string>();
+            for (var i = 0; i < beamLineElems.Count; i++)
+            {
+                string id = "e" + i.ToString();
+                elmIds.Add(id);
+            }
+            List<BuilderBeam> elems = k3d.Part.LineToBeam(beamLineElems, elmIds, croSecList, logger, out nodes);
 
             ///Supports & Loads======================================================================
             List<List<bool>> supportConditions = CreateSupportCondition();
-            List<int> TparamIndexOfColumnPos = ComputeTparamIndexOfColumnPos(tParams);
             List<Support> supports = new List<Support>();
-            //Line l = new Line(this.BeamLinePoints[0], this.BeamLinePoints[1]);
             for (int i = 0; i < this.columnPositions.Count; i++)
             {
                 Point3 nodePt = new Point3(this.columnPositions[i][0], this.columnPositions[i][1], this.columnPositions[i][2]);
-                RhinoApp.WriteLine(nodePt + "nodePt");
                 Support support = k3d.Support.Support(nodePt, supportConditions[i]);
                 supports.Add(support);
             }
@@ -125,23 +130,82 @@ namespace ICL.Core.StructuralModelling
             out flag);
 
             ///Analyse==========================================================================
-            //List<double> max_disp;
-            //List<double> out_g;
-            //List<double> out_comp;
-            //string message;
-            //model = k3d.Algorithms.AnalyzeThI(model, out max_disp, out out_g, out out_comp, out message);
+            List<double> max_disp;
+            List<double> out_g;
+            List<double> out_comp;
+            string message;
+            model = k3d.Algorithms.AnalyzeThI(model, out max_disp, out out_g, out out_comp, out message);
 
-            /////NodalDisplacements
-            //model = model.Clone();
-            //model.cloneElements();
-            //string lc_ind = "0";
-            //List<int> ids = ComputeNodeIDs(tParams);
-            //var trans = new List<List<Vector3>>();
-            //var rotat = new List<List<Vector3>>();
-            //NodalDisp.solve(model, lc_ind, ids, out trans, out rotat);
+            ///NodalDisplacements
+            var trans = new List<List<Vector3>>();
+            var rotat = new List<List<Vector3>>();
+            ////Karamba.Results.BeamDisplacements.solve(model, new List<string>() { "e0", "e1", "e2", "e3" }, elems, -1, tParamsList, out trans, out rotat);
+            model = model.Clone();
+            model.cloneElements();
+            string lc_ind = "0";
+            List<int> ids = new List<int>();
+            for (int i = 0; i < beamElementsNodes.Count; i++)
+            {
+                ids.Add(i);
+            }
+
+            NodalDisp.solve(model, lc_ind, ids, out trans, out rotat);
 
             return model;
 
+        }
+        public List<Line3> ComputeBeamLineElems(List<Point3> nodePoints)
+        {
+            List<Line3> beamLineElems = new List<Line3>();
+            List<List<Point3>> pointPairs = new List<List<Point3>>();
+            for (int i = 0; i < nodePoints.Count - 1; i++)
+            {
+                List<Point3> inputNest = new List<Point3>();
+                inputNest.Add(nodePoints[i]);
+                inputNest.Add(nodePoints[i + 1]);
+                pointPairs.Add(inputNest);
+            }
+            foreach (var pair in pointPairs)
+            {
+                var l = new Line3(pair);
+                beamLineElems.Add(l);
+            }
+            return beamLineElems;
+        }
+        public List<Point3> ComputeNodeDivisions(List<Line3> elemLines)
+        {
+            List<Point3d> nodesTemp = new List<Point3d>();
+            List<Point3> nodes = new List<Point3>();
+            foreach (Line3 l in elemLines)
+            {
+                Point3 spt = l.PointAtStart;
+                Point3 ept = l.PointAtEnd;
+                Line line = new Line(new Point3d(spt[0], spt[1], spt[2]), new Point3d(ept[0], ept[1], ept[2]));
+                double lineLength = line.Length;
+                int nCount = Convert.ToInt32(Math.Round(lineLength / divisionLength));
+                RhinoApp.WriteLine(nCount + "nCount");
+                if (nCount == 0)
+                {
+                    nodesTemp.Add(line.ToNurbsCurve().PointAt(0));
+                    nodesTemp.Add(line.ToNurbsCurve().PointAt(1));
+                }
+                else
+                {
+                    double[] tParams = line.ToNurbsCurve().DivideByCount(nCount, true);
+                    foreach (var t in tParams)
+                    {
+                        Point3d pt = line.ToNurbsCurve().PointAt(t);
+                        nodesTemp.Add(pt);
+                    }
+                }
+            }
+            Point3d[] cullPoints = Point3d.CullDuplicates(nodesTemp, 0.01);
+            foreach (Point3d pt in cullPoints)
+            {
+                Point3 kpt = new Point3(pt[0], pt[1], pt[2]);
+                nodes.Add(kpt);
+            }
+            return nodes;
         }
         /// <summary>
         /// Method for computing the line segments that make up a beam (affected by column positions)

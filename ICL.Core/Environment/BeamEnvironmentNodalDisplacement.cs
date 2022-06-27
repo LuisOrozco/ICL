@@ -60,17 +60,15 @@ namespace ICL.Core.Environment
         }
 
         //Method2: Execute
-        public Model Execute()
+        public List<List<Vector3>> Execute()
         {
-            //call FEM 
             BeamFEM createBeamEnvironmentFEM = new BeamFEM(this.EnvironmentBoundary, this.AgentPositions, this.BeamLoads, this.BeamMaterial[0]);
-            Model beamModelTest = createBeamEnvironmentFEM.ComputeFEM();
-            //List<Line3> sortingTest = createBeamEnvironmentFEM.ComputeBeamLineSegments();
+            List<Point3> nodes = new List<Point3>();
+            Model beamModelTest = createBeamEnvironmentFEM.ComputeFEM(ref nodes);
+            FEA createBeamEnvironmentFEA = new FEA(beamModelTest, nodes);
+            List<List<Vector3>> nodalDisp = createBeamEnvironmentFEA.ComputeNodalDisplacements();
 
-
-
-            return beamModelTest;
-
+            return nodalDisp;
         }
 
     }

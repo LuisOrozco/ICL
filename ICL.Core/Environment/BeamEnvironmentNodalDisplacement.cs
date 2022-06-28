@@ -1,18 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Rhino.Geometry;
 using ICL.Core.StructuralModelling;
 using ICL.Core.StructuralAnalysis;
 using Karamba.Geometry;
-using Karamba.Supports;
 using Karamba.Models;
-using Karamba.CrossSections;
-using Karamba.Elements;
-using Karamba.Loads;
-using Rhino;
 
 
 namespace ICL.Core.Environment

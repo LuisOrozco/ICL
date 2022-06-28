@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Rhino.Geometry;
-using Karamba;
 using Karamba.Geometry;
-using KarambaCommon;
 using Karamba.Supports;
 using Karamba.CrossSections;
 using Karamba.Utilities;
@@ -31,8 +26,15 @@ namespace ICL.Core.StructuralModelling
         public List<string> BeamLoadTypes = new List<string>();
         public Dictionary<int, Point3d> NodalDisplacement = new Dictionary<int, Point3d>();
         public string Material;
-        //public List<Point3> Nodes = new List<Point3>();
 
+        /// <summary>
+        /// initialize attributes
+        /// </summary>
+        /// <Params> 
+        /// beamLinePoints: list of Rhino.Geometry.Point3d
+        /// columnPositions: list of Rhino.Geometry.Point3d 
+        /// beamLoadTypes: list of string
+        /// material: string </Params>
         public BeamFEM(List<Point3d> beamLinePoints, List<Point3d> columnPositions, List<string> beamLoadTypes, string material)
         {
             this.BeamLinePoints = beamLinePoints;
@@ -40,7 +42,15 @@ namespace ICL.Core.StructuralModelling
             this.BeamLoadTypes = beamLoadTypes;
             this.Material = material;
         }
-        ///create Beam element 
+
+        /// Method:0
+        /// <summary>
+        /// Method to compute Finite Element Model
+        /// </summary>
+        /// <Params> 
+        /// dispNodes: List of Karamba.Geometry.Point3 
+        /// </Params>
+        /// <returns> Karamba.Models.Model </returns>
         public Model ComputeFEM(ref List<Point3> dispNodes)
         {
             ///KarambaLine==========================================================================
@@ -155,6 +165,14 @@ namespace ICL.Core.StructuralModelling
 
         }
 
+        /// Method:1
+        /// <summary>
+        /// Computes the beam line elements / segemnts based on nodal positions
+        /// </summary>
+        /// <Params> 
+        /// nodePoints: List of Karamba.Geometry.Point3 
+        /// </Params>
+        /// <returns> Karamba.Geometry.Line3 </returns>
         public List<Line3> ComputeBeamLineElems(List<Point3> nodePoints)
         {
             List<Line3> beamLineElems = new List<Line3>();
@@ -173,6 +191,15 @@ namespace ICL.Core.StructuralModelling
             }
             return beamLineElems;
         }
+
+        /// Method:2
+        /// <summary>
+        /// Computes the noes on beam based on support locations
+        /// </summary>
+        /// <Params> 
+        /// nodePoints: List of Karamba.Geometry.Line3
+        /// </Params>
+        /// <returns> Karamba.Geometry.Point3 </returns>
         public List<Point3> ComputeNodeDivisions(List<Line3> elemLines)
         {
             List<Point3d> nodesTemp = new List<Point3d>();
@@ -208,8 +235,10 @@ namespace ICL.Core.StructuralModelling
             }
             return nodes;
         }
+
+        /// Method:3
         /// <summary>
-        /// Method for computing the line segments that make up a beam (affected by column positions)
+        /// Method for computing the line segments of beam based on support locations
         /// </summary>
         /// <returns> List<Line3> a list of karamba Line3 </Line3></returns>
         public List<Line3> ComputeBeamLineSegments()
@@ -293,6 +322,7 @@ namespace ICL.Core.StructuralModelling
 
         }
 
+        /// Method:4
         /// <summary>
         /// Method for creating a Karamba Line3 element form a nested list of point3d elements
         /// </summary>
@@ -309,6 +339,7 @@ namespace ICL.Core.StructuralModelling
             return lineSegments;
         }
 
+        /// Method:5
         /// <summary>
         /// Method for sorting list of point3d elements in assending order
         /// </summary>
@@ -326,6 +357,7 @@ namespace ICL.Core.StructuralModelling
             return sortedPoints;
         }
 
+        /// Method:6
         /// <summary>
         /// Method creating a sliding window iterator for list of point3d
         /// </summary>
@@ -346,6 +378,7 @@ namespace ICL.Core.StructuralModelling
             return iterationGroups;
         }
 
+        /// Method:7
         /// <summary>
         /// Method to compute node IDs
         /// </summary>
@@ -361,6 +394,7 @@ namespace ICL.Core.StructuralModelling
             return ids;
         }
 
+        /// Method:8
         /// <summary>
         /// Methos to compute the parameter of a Point3d on a Curve
         /// </summary>
@@ -413,6 +447,7 @@ namespace ICL.Core.StructuralModelling
             return columnPosParamLocation;
         }
 
+        /// Method:9
         /// <summary>
         /// Method creating Kasramba support conditions
         /// </summary>
@@ -428,6 +463,7 @@ namespace ICL.Core.StructuralModelling
             return conditions;
         }
 
+        /// Method:10
         /// <summary>
         /// Method to compute beamline divisions and their respective paramters
         /// </summary>
@@ -440,11 +476,6 @@ namespace ICL.Core.StructuralModelling
             double[] tParams = line.ToNurbsCurve().DivideByCount(nCount, true);
             return tParams;
         }
-        ///material definition
-        ///load definition
-        ///support definition
-        ///support definition
-        ///create model 
-        ///return model
+
     }
 }

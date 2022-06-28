@@ -12,7 +12,7 @@ using Karamba.Models;
 using Karamba.CrossSections;
 using Karamba.Elements;
 using Karamba.Loads;
-
+using Rhino;
 
 
 namespace ICL.Core.Environment
@@ -20,7 +20,7 @@ namespace ICL.Core.Environment
     public class BeamEnvironmentNodalDisplacement
     {
         ///dict of  nodal displacements 
-        public Dictionary<int, Point3d> NodalDisplacement = new Dictionary<int, Point3d>();
+        public Dictionary<int, List<Point3d>> NodalDisplacement = new Dictionary<int, List<Point3d>>();
 
         ///list of positions of the agent 
         public List<Point3d> AgentPositions = new List<Point3d>();
@@ -59,16 +59,28 @@ namespace ICL.Core.Environment
             NodalDisplacement.Clear();
         }
 
-        //Method2: Execute
-        public List<List<Vector3>> Execute()
+        //Method2: update
+        public void UpdateEnvironment()
+        {
+            this.Reset();
+            Execute();
+            //call execute
+        }
+
+        //Method3: Execute
+        public void Execute() //make this void
         {
             BeamFEM createBeamEnvironmentFEM = new BeamFEM(this.EnvironmentBoundary, this.AgentPositions, this.BeamLoads, this.BeamMaterial[0]);
             List<Point3> nodes = new List<Point3>();
             Model beamModelTest = createBeamEnvironmentFEM.ComputeFEM(ref nodes);
             FEA createBeamEnvironmentFEA = new FEA(beamModelTest, nodes);
-            List<List<Vector3>> nodalDisp = createBeamEnvironmentFEA.ComputeNodalDisplacements();
+            List<Point3d> nodalDisp = createBeamEnvironmentFEA.ComputeNodalDisplacements();
+            List<Point3d> rhNodes = createBeamEnvironmentFEA.ConvertPt3ToPt3d(nodes);
 
-            return nodalDisp;
+            for (int i = 0; i < nodalDisp.Count; i++)
+            {
+                NodalDisplacement.Add(i, new List<Point3d>() { rhNodes[i], nodalDisp[i] });
+            }
         }
 
     }

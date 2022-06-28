@@ -154,6 +154,7 @@ namespace ICL.Core.StructuralModelling
             return model;
 
         }
+
         public List<Line3> ComputeBeamLineElems(List<Point3> nodePoints)
         {
             List<Line3> beamLineElems = new List<Line3>();

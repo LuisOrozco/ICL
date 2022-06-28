@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Rhino.Geometry;
 using ICL.Core.StructuralModelling;
 using ICL.Core.StructuralAnalysis;
 using Karamba.Geometry;
+using Karamba.Models;
+
 
 namespace ICL.Core.Environment
 {
     public class BeamEnvironmentNodalDisplacement
     {
         ///dict of  nodal displacements 
-        public Dictionary<int, Point3d> NodalDisplacement = new Dictionary<int, Point3d>();
+        public Dictionary<int, List<Point3d>> NodalDisplacement = new Dictionary<int, List<Point3d>>();
 
         ///list of positions of the agent 
         public List<Point3d> AgentPositions = new List<Point3d>();
@@ -30,7 +28,14 @@ namespace ICL.Core.Environment
         ///beam environment material
         public List<string> BeamMaterial = new List<string>();
 
-        ///new instance of EnvironmentNodalNodalDisplacement
+        /// <summary>
+        /// Method for initializing global attributes
+        /// </summary>
+        /// <Params> 
+        /// agentPositions: list of Karamba.Geometry.Point3
+        /// environmentBoundary: list of Rhino.Geometry.Point3d
+        /// beamLoads: list of string 
+        /// beamMaterial: List of string</Params>
         public BeamEnvironmentNodalDisplacement(List<Point3d> agentPositions, List<Point3d> environmentBoundary, List<string> beamLoads, List<string> beamMaterial)
         {
             this.AgentStartPositons = this.AgentPositions = agentPositions;
@@ -39,31 +44,54 @@ namespace ICL.Core.Environment
             this.BeamMaterial = beamMaterial;
         }
 
-        ///Method:0 reset the environment
+        /// Method:0 reset the environment
+        /// <summary>
+        /// Method to Reset NodalDisplacements Dictionary
+        /// </summary>
         public void Reset()
         {
             //this.AgentPositions = this.AgentStartPositons;
             NodalDisplacement.Clear();
         }
 
-        //Method1: PreExecute 
+        /// Method1: PreExecute 
+        /// <summary>
+        /// Method to clear NodalDisplacements Dictionary
+        /// </summary>
         public void PreExecute()
         {
             NodalDisplacement.Clear();
         }
 
-        //Method2: Execute
-        public double[] Execute()
+        //Method2: update
+        /// Method1: PreExecute 
+        /// <summary>
+        /// Method to Update Environment nodal displacements
+        /// </summary>
+        public void UpdateEnvironment()
         {
-            //call FEM 
+            this.Reset();
+            Execute();
+            //call execute
+        }
+
+        //Method3: Execute
+        /// <summary>
+        /// Method to compute FEM and FEA of Bema. Updates NodalDisplacement Dict 
+        /// </summary>
+        public void Execute()
+        {
             BeamFEM createBeamEnvironmentFEM = new BeamFEM(this.EnvironmentBoundary, this.AgentPositions, this.BeamLoads, this.BeamMaterial[0]);
-            double[] lineTest = createBeamEnvironmentFEM.computeFEM();
+            List<Point3> nodes = new List<Point3>();
+            Model beamModelTest = createBeamEnvironmentFEM.ComputeFEM(ref nodes);
+            FEA createBeamEnvironmentFEA = new FEA(beamModelTest, nodes);
+            List<Point3d> nodalDisp = createBeamEnvironmentFEA.ComputeNodalDisplacements();
+            List<Point3d> rhNodes = createBeamEnvironmentFEA.ConvertPt3ToPt3d(nodes);
 
-            //call FEA 
-            //FEA analyse = new FEA();
-
-            return lineTest;
-
+            for (int i = 0; i < nodalDisp.Count; i++)
+            {
+                NodalDisplacement.Add(i, new List<Point3d>() { rhNodes[i], nodalDisp[i] });
+            }
         }
 
     }

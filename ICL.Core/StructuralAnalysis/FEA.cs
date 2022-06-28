@@ -16,15 +16,29 @@ namespace ICL.Core.StructuralAnalysis
 {
     public class FEA
     {
-        //public attributes
+        /// <summary>
+        /// public variables 
+        /// </summary>
         Model KarambaModel;
         List<Point3> Nodes = new List<Point3>();
-        //define attributes 
+
+        /// <summary>
+        /// initialize attributes
+        /// </summary>
+        /// <Params> 
+        /// nodes: list of Rhino.Geometry.Point3d
+        /// karambaModel: Karamba.Models.Model
         public FEA(Model karambaModel, List<Point3> nodes)
         {
             this.KarambaModel = karambaModel;
             this.Nodes = nodes;
         }
+
+        /// Method:0
+        /// <summary>
+        /// Method to compute nodal displacements
+        /// </summary>
+        /// <returns> List of Rhino.Geometry.Point3d </returns>
         public List<Point3d> ComputeNodalDisplacements()
         {
             List<Point3> nodalDisplacements = new List<Point3>();
@@ -61,6 +75,7 @@ namespace ICL.Core.StructuralAnalysis
             return dispacementNodePoints;
         }
 
+        /// Method:1
         /// <summary>
         /// Method for converting Karamba.Geomerty.Vector3 to Rhino.Geometry.Vector3d
         /// </summary>
@@ -77,6 +92,7 @@ namespace ICL.Core.StructuralAnalysis
             return rhVecs;
         }
 
+        /// Method:2
         /// <summary>
         /// Method for converting Rhino.Geomerty.Vector3d to Rhino.Geometry.Point3d
         /// </summary>
@@ -93,6 +109,7 @@ namespace ICL.Core.StructuralAnalysis
             return points;
         }
 
+        /// Method:3
         /// <summary>
         /// Method for converting Karamba.Geometry.Point3 to Rhino.Geometry.Point3d
         /// </summary>
@@ -109,6 +126,7 @@ namespace ICL.Core.StructuralAnalysis
             return points;
         }
 
+        /// Method:4
         /// <summary>
         /// Method to round or convert value by 7 decimal points
         /// </summary>

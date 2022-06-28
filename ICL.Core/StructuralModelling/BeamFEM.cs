@@ -160,9 +160,7 @@ namespace ICL.Core.StructuralModelling
             }
 
             NodalDisp.solve(model, lc_ind, ids, out trans, out rotat);
-
             return model;
-
         }
 
         /// Method:1

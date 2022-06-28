@@ -37,7 +37,14 @@ namespace ICL.Core.Environment
         ///beam environment material
         public List<string> BeamMaterial = new List<string>();
 
-        ///new instance of EnvironmentNodalNodalDisplacement
+        /// <summary>
+        /// Method for initializing global attributes
+        /// </summary>
+        /// <Params> 
+        /// agentPositions: list of Karamba.Geometry.Point3
+        /// environmentBoundary: list of Rhino.Geometry.Point3d
+        /// beamLoads: list of string 
+        /// beamMaterial: List of string</Params>
         public BeamEnvironmentNodalDisplacement(List<Point3d> agentPositions, List<Point3d> environmentBoundary, List<string> beamLoads, List<string> beamMaterial)
         {
             this.AgentStartPositons = this.AgentPositions = agentPositions;
@@ -46,20 +53,30 @@ namespace ICL.Core.Environment
             this.BeamMaterial = beamMaterial;
         }
 
-        ///Method:0 reset the environment
+        /// Method:0 reset the environment
+        /// <summary>
+        /// Method to Reset NodalDisplacements Dictionary
+        /// </summary>
         public void Reset()
         {
             //this.AgentPositions = this.AgentStartPositons;
             NodalDisplacement.Clear();
         }
 
-        //Method1: PreExecute 
+        /// Method1: PreExecute 
+        /// <summary>
+        /// Method to clear NodalDisplacements Dictionary
+        /// </summary>
         public void PreExecute()
         {
             NodalDisplacement.Clear();
         }
 
         //Method2: update
+        /// Method1: PreExecute 
+        /// <summary>
+        /// Method to Update Environment nodal displacements
+        /// </summary>
         public void UpdateEnvironment()
         {
             this.Reset();
@@ -68,7 +85,10 @@ namespace ICL.Core.Environment
         }
 
         //Method3: Execute
-        public void Execute() //make this void
+        /// <summary>
+        /// Method to compute FEM and FEA of Bema. Updates NodalDisplacement Dict 
+        /// </summary>
+        public void Execute()
         {
             BeamFEM createBeamEnvironmentFEM = new BeamFEM(this.EnvironmentBoundary, this.AgentPositions, this.BeamLoads, this.BeamMaterial[0]);
             List<Point3> nodes = new List<Point3>();

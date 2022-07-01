@@ -38,34 +38,59 @@ namespace ICL.Core.AgentBehaviors
             Dictionary<string, List<Point3d>> neighborNodes = FindNeightbors(columnAgent.Position, out agentPosNodeIndex);
 
             //get vector to move towards max displacement node
-            //--- compair nodes with max displacement 
-            if (this.NodalDisplacemenets.Count == 1)
+            if (neighborNodes.Count == 1)
             {
                 //neighbor node - support node
-                var item = this.NodalDisplacemenets.ElementAt(0);
+                var item = neighborNodes.ElementAt(0);
                 Point3d neighbourNode = item.Value[0];
 
-                Vector3d vec = neighbourNode - columnAgent.Position;
-                vec.Unitize();
-                Vector3d moveVec = vec * this.SteppingFactor;
-                columnAgent.Moves.Add(moveVec);
-                RhinoApp.WriteLine(moveVec + "moveVec");
-                RhinoApp.WriteLine(columnAgent.Moves + "columnAgent.Moves");
+                AddMoves(neighbourNode, columnAgent.Position, columnAgent);
             }
-            //Point3d ancestorNode = neighborNodes["ancestor"][0];
-            //Point3d ancestorNodalDisp = neighborNodes["ancestor"][1];
-            //--- get the node of node with max displaceemnt and subtract it with the columnagent.position
-            //--- unitize the vector this is the new position in which the agent shoudl move 
-            //--- magnitue of movement is a variable defined by user (can be any double value* in theory)
+            else if (neighborNodes.Count > 1)
+            {
+                Point3d ancestorNode = neighborNodes["ancestor"][0];
+                Point3d ancestorNodalDisp = neighborNodes["ancestor"][1];
 
-            //move agent by magnitue of node divisions and direction of max displacement
-            //--- update the position of the vector with this value
+                Point3d descendantNode = neighborNodes["descendant"][0];
+                Point3d descendantNodalDisp = neighborNodes["descendant"][1];
 
-            //throw new NotImplementedException();
+                if (ancestorNodalDisp > descendantNodalDisp)
+                {
+                    AddMoves(ancestorNode, columnAgent.Position, columnAgent);
+                    RhinoApp.WriteLine("ancestorNodalDisp");
+                }
+                else if (descendantNodalDisp > ancestorNodalDisp)
+                {
+                    AddMoves(descendantNode, columnAgent.Position, columnAgent);
+                    RhinoApp.WriteLine("descendantNodalDisp");
+                }
+            }
         }
 
-
         /// Method:1
+        /// <summary>
+        /// performs vector operations and adds the scaled vector to the agent moves list
+        /// is returned
+        /// </summary>
+        /// <Param> 
+        /// Point3d: neighbour node 
+        /// Point3d: node
+        /// CartesianAgent: column agent
+        /// </Param>
+        public void AddMoves(Point3d neighbour, Point3d node, CartesianAgent agent)
+        {
+            Vector3d vec = neighbour - node;
+            vec.Unitize();
+            Vector3d moveVec = vec * this.SteppingFactor;
+            agent.Moves.Add(moveVec);
+            /// <summary>
+            /// print check 
+            /// </summary>
+            RhinoApp.WriteLine(moveVec + "moveVec");
+            RhinoApp.WriteLine(agent.Moves + "columnAgent.Moves");
+        }
+
+        /// Method:2
         /// <summary>
         /// Given Point3d ColumnAgent, the neighbouring node from the NodalDisplacements with the max nodal displacement
         /// is returned

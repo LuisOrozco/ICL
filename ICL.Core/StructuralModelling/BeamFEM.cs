@@ -209,7 +209,6 @@ namespace ICL.Core.StructuralModelling
                 Line line = new Line(new Point3d(spt[0], spt[1], spt[2]), new Point3d(ept[0], ept[1], ept[2]));
                 double lineLength = line.Length;
                 int nCount = Convert.ToInt32(Math.Round(lineLength / divisionLength));
-                RhinoApp.WriteLine(nCount + "nCount");
                 if (nCount == 0)
                 {
                     nodesTemp.Add(line.ToNurbsCurve().PointAt(0));

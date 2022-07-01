@@ -46,7 +46,7 @@ namespace ICL.Core.AgentBehaviors
 
                 AddMoves(neighbourNode, columnAgent.Position, columnAgent);
             }
-            else if (neighborNodes.Count > 1)
+            else if (neighborNodes.Count > 1) //Note this is only suitable for beams or elements with onlz 2 neighbours)reimplement for slab)
             {
                 Point3d ancestorNode = neighborNodes["ancestor"][0];
                 Point3d ancestorNodalDisp = neighborNodes["ancestor"][1];

@@ -15,13 +15,6 @@ namespace ICL.Core.AgentBehaviors
         //public variables 
         public Dictionary<int, List<Point3d>> NodalDisplacemenets = new Dictionary<int, List<Point3d>>();
         public double SteppingFactor = 100; //in mm
-        /// <summary>
-        /// Constructs a new instance of the Boid cohesion behavior.
-        /// </summary>
-        public MaxDisplacementBehavior(Dictionary<int, List<Point3d>> nodalDisplacemenets)
-        {
-            this.NodalDisplacemenets = nodalDisplacemenets;
-        }
 
         /// Method:0
         /// <summary>

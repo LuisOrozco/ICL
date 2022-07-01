@@ -6,6 +6,7 @@ using ICD.AbmFramework.Core.Behavior;
 using ICD.AbmFramework.Core.AgentSystem;
 using ICD.AbmFramework.Core.Environments;
 using Rhino.Geometry;
+using Rhino;
 
 namespace ICL.Core.AgentBehaviors
 {
@@ -13,7 +14,7 @@ namespace ICL.Core.AgentBehaviors
     {
         //public variables 
         public Dictionary<int, List<Point3d>> NodalDisplacemenets = new Dictionary<int, List<Point3d>>();
-
+        public double SteppingFactor = 100; //in mm
         /// <summary>
         /// Constructs a new instance of the Boid cohesion behavior.
         /// </summary>
@@ -38,6 +39,19 @@ namespace ICL.Core.AgentBehaviors
 
             //get vector to move towards max displacement node
             //--- compair nodes with max displacement 
+            if (this.NodalDisplacemenets.Count == 1)
+            {
+                //neighbor node - support node
+                var item = this.NodalDisplacemenets.ElementAt(0);
+                Point3d neighbourNode = item.Value[0];
+
+                Vector3d vec = neighbourNode - columnAgent.Position;
+                vec.Unitize();
+                Vector3d moveVec = vec * this.SteppingFactor;
+                columnAgent.Moves.Add(moveVec);
+                RhinoApp.WriteLine(moveVec + "moveVec");
+                RhinoApp.WriteLine(columnAgent.Moves + "columnAgent.Moves");
+            }
             //Point3d ancestorNode = neighborNodes["ancestor"][0];
             //Point3d ancestorNodalDisp = neighborNodes["ancestor"][1];
             //--- get the node of node with max displaceemnt and subtract it with the columnagent.position

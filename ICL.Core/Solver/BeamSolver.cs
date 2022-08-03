@@ -5,18 +5,20 @@ using System.Text;
 using System.Threading.Tasks;
 using Rhino;
 using ICD.AbmFramework.Core.AgentSystem;
-using ICL.Core.Environment;
 using ICD.AbmFramework.Core.Agent;
-using ICD.AbmFramework.Core.Behavior;
+
+using ICL.Core.Environment;
+using ICL.Core.AgentBehaviors;
+using ICL.Core.AgentSystem;
+using ICL.Core.Agent;
+
 
 namespace ICL.Core.Solver
 {
-    internal class NamespaceDoc { }
-
     public class BeamSolver
     {
         // public attributes 
-        public List<AgentSystemBase> AgentSystems;
+        public List<ICLagentSystemBase> AgentSystems;
 
         public int IterationCount = 0;
 
@@ -25,31 +27,34 @@ namespace ICL.Core.Solver
         // Method for starting solver from a new list
         public BeamSolver()
         {
-            this.AgentSystems = new List<AgentSystemBase>();
+            this.AgentSystems = new List<ICLagentSystemBase>();
         }
 
         ///Method0:
         ///<summary>
         ///Method for starting solver from an exisiting list of agents
         ///</summary>
-        public BeamSolver(List<AgentSystemBase> agentSystems)
+        public BeamSolver(List<ICLagentSystemBase> agentSystems)
         {
             this.AgentSystems = agentSystems;
 
-            foreach (AgentSystemBase agentSystem in this.AgentSystems)
+            foreach (ICLagentSystemBase agentSystem in this.AgentSystems)
             {
-                foreach (AgentBase agent in agentSystem.Agents)
+                foreach (ICLagentBase agent in agentSystem.Agents)
                 {
-                    foreach (BehaviorBase behavior in agent.Behaviors)
+                    foreach (ICLbehaviorBase behavior in agent.ICLbehaviors)
                     {
-                        behavior.Solver = BeamSolver; //solve from here //may be put the file outside the folder?
+                        behavior.BeamSolver = this; //solve from here //may be put the file outside the folder?
                     }
                 }
             }
-
-
-
         }
+
+        //public static implicit operator ICD.AbmFramework.Core.Solver(BeamSolver v)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
         ///List<Point3d> agentPositionsUpdate =  List<Point3d>()
         ///foreach (CartesianAgent agent in this.AgentSystems)
         ///agentPositionsUpdate.Add(agent.Positions)

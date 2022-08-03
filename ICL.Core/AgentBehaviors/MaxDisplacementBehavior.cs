@@ -10,7 +10,7 @@ using Rhino;
 
 namespace ICL.Core.AgentBehaviors
 {
-    public class MaxDisplacementBehavior : BehaviorBase
+    public class MaxDisplacementBehavior : ICLbehaviorBase
     {
         //public variables 
         public Dictionary<int, List<Point3d>> NodalDisplacemenets = new Dictionary<int, List<Point3d>>();

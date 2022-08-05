@@ -17,6 +17,7 @@ namespace ICL.Core.AgentBehaviors
     {
         //public variables 
         public Dictionary<int, List<Point3d>> NodalDisplacemenets = new Dictionary<int, List<Point3d>>();
+        public Dictionary<int, List<Point3d>> StartNodalDisplacemenets = new Dictionary<int, List<Point3d>>();
         public double SteppingFactor = 100; //in mm
 
         /// Method:0
@@ -33,7 +34,19 @@ namespace ICL.Core.AgentBehaviors
             this.NodalDisplacemenets = cartesianEnvironment.NodalDisplacement; //will this make the first run empty?
             //identify agent's neighbour node with max displacement 
             //int agentPosNodeIndex;
-            Dictionary<string, List<Point3d>> neighborNodes = FindNeightbors(columnAgent.Position, out int agentPosNodeIndex);
+
+            Dictionary<string, List<Point3d>> neighborNodes = new Dictionary<string, List<Point3d>>();
+            //check to pass startdict or dict
+
+            if (this.NodalDisplacemenets.Count == 0)
+            {
+                neighborNodes = FindNeightbors(columnAgent.Position, this.StartNodalDisplacemenets, out int agentPosNodeIndex);
+            }
+
+            else if (this.NodalDisplacemenets.Count > 0)
+            {
+                neighborNodes = FindNeightbors(columnAgent.Position, this.NodalDisplacemenets, out int agentPosNodeIndex);
+            }
 
             //get vector to move towards max displacement node
             if (neighborNodes.Count == 1)
@@ -94,24 +107,24 @@ namespace ICL.Core.AgentBehaviors
         /// is returned
         /// </summary>
         /// <Param> Rhino.Geometry.Point3d columnAgent position</Param>
-        public Dictionary<string, List<Point3d>> FindNeightbors(Point3d agentPosition, out int agentPosNodeIndex)
+        public Dictionary<string, List<Point3d>> FindNeightbors(Point3d agentPosition, Dictionary<int, List<Point3d>> displacementsDict, out int agentPosNodeIndex)
         {
             Dictionary<string, List<Point3d>> neighborNodes = new Dictionary<string, List<Point3d>>();
             agentPosNodeIndex = 0;
-            for (int i = 0; i < this.NodalDisplacemenets.Count; i++) //get nodal displacements from environment
+            for (int i = 0; i < displacementsDict.Count; i++) //get nodal displacements from environment
             {
-                var item = this.NodalDisplacemenets.ElementAt(i);
+                var item = displacementsDict.ElementAt(i);
                 Point3d node = item.Value[0];
                 Point3d nodalDisp = item.Value[1];
-                if ((agentPosition == node) && (i != 0) && (i != this.NodalDisplacemenets.Count - 1))
+                if ((agentPosition == node) && (i != 0) && (i != displacementsDict.Count - 1))
                 {
                     agentPosNodeIndex = i;
-                    var itemAncestor = this.NodalDisplacemenets.ElementAt(i - 1);
+                    var itemAncestor = displacementsDict.ElementAt(i - 1);
                     Point3d nodeAncestor = itemAncestor.Value[0];
                     Point3d nodalDispAncestor = itemAncestor.Value[1];
                     neighborNodes.Add("ancestor", new List<Point3d>() { nodeAncestor, nodalDispAncestor });
 
-                    var itemDescendant = this.NodalDisplacemenets.ElementAt(i + 1);
+                    var itemDescendant = displacementsDict.ElementAt(i + 1);
                     Point3d nodeDescendant = itemDescendant.Value[0];
                     Point3d nodalDispDescendant = itemDescendant.Value[1];
                     neighborNodes.Add("descendant", new List<Point3d>() { nodeDescendant, nodalDispDescendant });
@@ -119,15 +132,15 @@ namespace ICL.Core.AgentBehaviors
                 else if ((agentPosition == node) && (i == 0))
                 {
                     agentPosNodeIndex = i;
-                    var itemDescendant = this.NodalDisplacemenets.ElementAt(i + 1);
+                    var itemDescendant = displacementsDict.ElementAt(i + 1);
                     Point3d nodeDescendant = itemDescendant.Value[0];
                     Point3d nodalDispDescendant = itemDescendant.Value[1];
                     neighborNodes.Add("descendant", new List<Point3d>() { nodeDescendant, nodalDispDescendant });
                 }
-                else if ((agentPosition == node) && (i == this.NodalDisplacemenets.Count - 1))
+                else if ((agentPosition == node) && (i == displacementsDict.Count - 1))
                 {
                     agentPosNodeIndex = i;
-                    var itemAncestor = this.NodalDisplacemenets.ElementAt(i - 1);
+                    var itemAncestor = displacementsDict.ElementAt(i - 1);
                     Point3d nodeAncestor = itemAncestor.Value[0];
                     Point3d nodalDispAncestor = itemAncestor.Value[1];
                     neighborNodes.Add("ancestor", new List<Point3d>() { nodeAncestor, nodalDispAncestor });

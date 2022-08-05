@@ -8,7 +8,7 @@ using Karamba.Models;
 
 namespace ICL.Core.Environment
 {
-    public class BeamEnvironmentNodalDisplacement
+    public class ICLcartesianEnvironment: ICLenvironmentBase
     {
         ///dict of  nodal displacements 
         public Dictionary<int, List<Point3d>> NodalDisplacement = new Dictionary<int, List<Point3d>>();
@@ -36,7 +36,7 @@ namespace ICL.Core.Environment
         /// environmentBoundary: list of Rhino.Geometry.Point3d
         /// beamLoads: list of string 
         /// beamMaterial: List of string</Params>
-        public BeamEnvironmentNodalDisplacement(List<Point3d> agentPositions, List<Point3d> environmentBoundary, List<string> beamLoads, List<string> beamMaterial)
+        public ICLcartesianEnvironment(List<Point3d> agentPositions, List<Point3d> environmentBoundary, List<string> beamLoads, List<string> beamMaterial)
         {
             this.AgentStartPositons = this.AgentPositions = agentPositions;
             this.EnvironmentBoundary = environmentBoundary;

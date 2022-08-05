@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Rhino;
+using Rhino.Geometry;
+
 using ICD.AbmFramework.Core.AgentSystem;
 using ICD.AbmFramework.Core.Agent;
 
@@ -22,7 +24,7 @@ namespace ICL.Core.Solver
 
         public int IterationCount = 0;
 
-        public BeamEnvironmentNodalDisplacement BeamStructuralData;
+        public ICLcartesianEnvironment BeamStructuralData;
 
         // Method for starting solver from a new list
         public BeamSolver()
@@ -50,6 +52,51 @@ namespace ICL.Core.Solver
             }
         }
 
+        /// <summary>  solver with display conduit</summary>
+        public void ExecuteSingleStep()
+        {
+            IterationCount++;
+
+            foreach (ICLagentSystemBase agentSystem in AgentSystems)
+                if (!agentSystem.IsFinished()) agentSystem.PreExecute();
+
+            foreach (ICLagentSystemBase agentSystem in AgentSystems)
+                if (!agentSystem.IsFinished()) agentSystem.Execute();
+
+            foreach (ICLagentSystemBase agentSystem in AgentSystems)
+                if (!agentSystem.IsFinished()) agentSystem.PostExecute();
+
+            foreach (ICLcartesianAgentSystem agentSystem in AgentSystems)
+            {
+                if (!agentSystem.IsFinished())
+                {
+                    List<Point3d> updatedAgentPositions = UpdatedPositions(agentSystem);
+                    agentSystem.CartesianEnvironment.AgentStartPositons = updatedAgentPositions;
+                    agentSystem.CartesianEnvironment.UpdateEnvironment();
+                }
+            }
+
+        }
+
+        public List<object> GetDisplayGeometries()
+        {
+            List<object> displayGeometries = new List<object>();
+            foreach (AgentSystemBase agentSystem in AgentSystems)
+                displayGeometries.AddRange(agentSystem.GetDisplayGeometries());
+            return displayGeometries;
+        }
+
+        public List<Point3d> UpdatedPositions(ICLagentSystemBase agentSystem)
+        {
+            List<Point3d> agentPositionsUpdate = new List<Point3d>();
+
+            foreach (ICLcartesianAgent agent in agentSystem.Agents)
+            {
+                Point3d point = agent.Position;
+                agentPositionsUpdate.Add(point);
+            }
+            return agentPositionsUpdate;
+        }
         //public static implicit operator ICD.AbmFramework.Core.Solver(BeamSolver v)
         //{
         //    throw new NotImplementedException();

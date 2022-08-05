@@ -12,6 +12,8 @@ using Rhino;
 using Rhino.Geometry;
 
 using ICD.AbmFramework.Core.Environments;
+
+using ICL.Core.Environment;
 using ICL.Core.Agent;
 
 namespace ICL.Core.AgentSystem
@@ -29,7 +31,7 @@ namespace ICL.Core.AgentSystem
         /// <summary>
         /// The field to access the Cartesian environment of this agent system.
         /// </summary>
-        public CartesianEnvironment CartesianEnvironment;
+        public ICLcartesianEnvironment CartesianEnvironment;
         /// <summary>
         /// Boolean toggle to determine if Voronoi diagram should be computed for this system.
         /// </summary>
@@ -44,7 +46,7 @@ namespace ICL.Core.AgentSystem
         /// </summary>
         /// <param name="agents">The cartesian agents</param>
         /// <param name="cartesianEnvironment">The cartesian environment</param>
-        public ICLcartesianAgentSystem(List<ICLcartesianAgent> agents, CartesianEnvironment cartesianEnvironment)
+        public ICLcartesianAgentSystem(List<ICLcartesianAgent> agents, ICLcartesianEnvironment cartesianEnvironment)
         {
             this.CartesianEnvironment = cartesianEnvironment;
             this.ICLagents = new List<ICLagentBase>();
@@ -71,7 +73,7 @@ namespace ICL.Core.AgentSystem
                     nodes.Append(new Node2(agent.Position.X, agent.Position.Y));
                 diagram = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Connectivity(nodes, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, false);
                 List<Node2> node2List = new List<Node2>();
-                foreach (Point3d boundaryCorner in this.CartesianEnvironment.BoundaryCorners)
+                foreach (Point3d boundaryCorner in this.CartesianEnvironment.EnvironmentBoundary)
                     node2List.Add(new Node2(boundaryCorner.X, boundaryCorner.Y));
                 this.VoronoiCells = Grasshopper.Kernel.Geometry.Voronoi.Solver.Solve_Connectivity(nodes, diagram, (IEnumerable<Node2>)node2List);
             }

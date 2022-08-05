@@ -9,7 +9,7 @@ using Rhino.Geometry;
 ///Copy "..\bin\yourAddon.dll" "$(AppData)\Grasshopper\Libraries\yourAddon.dll"
 
 
-namespace ICL.Core.AgentPos
+namespace ICL.Core.Utilities
 {
     /// <summary>
     /// The AgentPos namespace contains fundamental types that define commonly used value types and classes for computing the column agent start pos

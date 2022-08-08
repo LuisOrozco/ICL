@@ -2,10 +2,10 @@
 using System.Linq;
 using System.Collections.Generic;
 using ICD.AbmFramework.Core.Agent;
+using ICD.AbmFramework.Core.Behavior;
 using ICD.AbmFramework.Core.AgentSystem;
-using ICD.AbmFramework.Core.Environments;
 
-using ICL.Core.Agent;
+
 using ICL.Core.AgentSystem;
 using ICL.Core.Environment;
 using Rhino.Geometry;
@@ -13,7 +13,7 @@ using Rhino;
 
 namespace ICL.Core.AgentBehaviors
 {
-    public class MaxDisplacementBehavior : ICLbehaviorBase
+    public class MaxDisplacementBehavior : BehaviorBase
     {
         //public variables 
         public Dictionary<int, List<Point3d>> NodalDisplacemenets = new Dictionary<int, List<Point3d>>();
@@ -26,7 +26,7 @@ namespace ICL.Core.AgentBehaviors
         /// </summary>
         public override void Execute(AgentBase agent)
         {
-            ICLcartesianAgent columnAgent = (ICLcartesianAgent)agent;
+            CartesianAgent columnAgent = (CartesianAgent)agent;
             ICLcartesianAgentSystem cartesianSystem = (ICLcartesianAgentSystem)(columnAgent.AgentSystem);
             ICLcartesianEnvironment cartesianEnvironment = cartesianSystem.CartesianEnvironment;
 
@@ -88,7 +88,7 @@ namespace ICL.Core.AgentBehaviors
         /// Point3d: node
         /// CartesianAgent: column agent
         /// </Param>
-        public void AddMoves(Point3d neighbour, Point3d node, ICLcartesianAgent agent)
+        public void AddMoves(Point3d neighbour, Point3d node, CartesianAgent agent)
         {
             Vector3d vec = neighbour - node;
             vec.Unitize();

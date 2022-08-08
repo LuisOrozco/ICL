@@ -71,7 +71,6 @@
     <Compile Include="test\Car.cs" />
     <Compile Include="Utilities\BeamInitializeAgents.cs" />
     <Compile Include="AgentSystem\ICLcartesianAgentSystem.cs" />
-    <Compile Include="AgentSystem\ICLagentSystemBase.cs" />
     <Compile Include="Environment\ICLcartesianEnvironment.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Solver\BeamSolver.cs" />

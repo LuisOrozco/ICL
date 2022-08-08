@@ -1,24 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Grasshopper.Kernel.Geometry;
+﻿using Grasshopper.Kernel.Geometry;
 using Grasshopper.Kernel.Geometry.Delaunay;
 using Grasshopper.Kernel.Geometry.Voronoi;
-
+using ICD.AbmFramework.Core.Agent;
+using ICD.AbmFramework.Core.AgentSystem;
+using ICL.Core.Environment;
 using Rhino;
 using Rhino.Geometry;
-
-using ICD.AbmFramework.Core.AgentSystem;
-using ICD.AbmFramework.Core.Agent;
-
-using ICL.Core.Environment;
+using System.Collections.Generic;
 
 namespace ICL.Core.AgentSystem
 {
-    public class ICLcartesianAgentSystem : AgentSystemBase // this could inherit from the ICD cartesian agent may be?
+    public class ICLcartesianAgentSystem : AgentSystemBase
     {
         /// <summary>
         /// The list of Voronoi cells associated with each agent.
@@ -44,8 +36,6 @@ namespace ICL.Core.AgentSystem
         /// <summary>
         /// Construct a new cartesian agent system
         /// </summary>
-        /// <param name="agents">The cartesian agents</param>
-        /// <param name="cartesianEnvironment">The cartesian environment</param>
         public ICLcartesianAgentSystem(List<CartesianAgent> agents, ICLcartesianEnvironment cartesianEnvironment)
         {
             this.CartesianEnvironment = cartesianEnvironment;

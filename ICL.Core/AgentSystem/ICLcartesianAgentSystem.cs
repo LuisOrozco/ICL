@@ -64,12 +64,12 @@ namespace ICL.Core.AgentSystem
             base.Reset();
         }
 
-        public override void PreExecute()
+        public override void ICLPreExecute()
         {
             if (ComputeVoronoiCells)
             {
                 Node2List nodes = new Node2List();
-                foreach (ICLcartesianAgent agent in this.Agents)
+                foreach (ICLcartesianAgent agent in this.ICLagents)
                     nodes.Append(new Node2(agent.Position.X, agent.Position.Y));
                 diagram = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Connectivity(nodes, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, false);
                 List<Node2> node2List = new List<Node2>();
@@ -81,13 +81,13 @@ namespace ICL.Core.AgentSystem
             if (ComputeDelaunayConnectivity)
             {
                 Node2List nodes = new Node2List();
-                foreach (ICLcartesianAgent agent in this.Agents)
+                foreach (ICLcartesianAgent agent in this.ICLagents)
                     nodes.Append(new Node2(agent.Position.X, agent.Position.Y));
                 diagram = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Connectivity(nodes, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, false);
             }
 
-            foreach (ICLagentBase agent in this.Agents)
-                agent.PreExecute();
+            foreach (ICLcartesianAgent agent in this.ICLagents)
+                agent.ICLPreExecute();
 
         }
 

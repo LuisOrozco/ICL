@@ -28,7 +28,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -68,6 +68,8 @@
     <Compile Include="AgentBehaviors\ICLbehaviorBase.cs" />
     <Compile Include="AgentBehaviors\MaxDisplacementBehavior.cs" />
     <Compile Include="Environment\ICLenvironmentBase.cs" />
+    <Compile Include="test\Wheel.cs" />
+    <Compile Include="test\Car.cs" />
     <Compile Include="Utilities\BeamInitializeAgents.cs" />
     <Compile Include="AgentSystem\ICLcartesianAgentSystem.cs" />
     <Compile Include="AgentSystem\ICLagentSystemBase.cs" />

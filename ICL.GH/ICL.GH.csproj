@@ -1,12 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <Version>1.0</Version>
     <Title>ICL.GH</Title>
     <Description>Description of ICL.GH</Description>
     <TargetExt>.gha</TargetExt>
+    <BaseOutputPath>C:\Users\ukeer\GitHub\ICL\ICL.GH\bin\Debug\net48</BaseOutputPath>
   </PropertyGroup>
+	
+  <ItemGroup>
+    <Compile Remove="bin\**" />
+    <EmbeddedResource Remove="bin\**" />
+    <None Remove="bin\**" />
+  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Include="Grasshopper" Version="6.35.21222.17001" IncludeAssets="compile;build" />
@@ -17,8 +24,14 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Reference Include="Karamba3D">
-      <HintPath>..\..\..\AppData\Roaming\McNeel\Rhinoceros\packages\7.0\Karamba3D\2.2.0.12\karamba.gha</HintPath>
+    <Reference Include="ICD.AbmFramework.Core">
+      <HintPath>..\..\..\AppData\Roaming\Grasshopper\Libraries\ICD.AbmFramework.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="ICL.Core">
+      <HintPath>..\ICL.Core\bin\Debug\ICL.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="KarambaCommon">
+      <HintPath>..\..\..\AppData\Roaming\McNeel\Rhinoceros\packages\7.0\Karamba3D\2.2.0.12\KarambaCommon.dll</HintPath>
     </Reference>
   </ItemGroup>
   
@@ -26,6 +39,14 @@
     <StartProgram>C:\Program Files\Rhino 7\System\Rhino.exe</StartProgram>
     <StartArguments></StartArguments>
     <StartAction>Program</StartAction>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>False</Optimize>
   </PropertyGroup>
 
 </Project>

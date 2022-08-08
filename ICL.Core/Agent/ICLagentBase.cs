@@ -15,6 +15,8 @@ namespace ICL.Core.Agent
         /// </summary>
         public List<ICLbehaviorBase> ICLbehaviors = new List<ICLbehaviorBase>();
 
+        public abstract void ICLPreExecute();
+
         /// <summary>
         /// The ID of the agent, unique within the given system
         /// </summary>

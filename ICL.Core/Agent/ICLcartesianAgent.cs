@@ -53,10 +53,15 @@ namespace ICL.Core.Agent
         /// <summary>
         /// Method for running code that should be pre-executed.
         /// </summary>
-        public override void PreExecute()
+        public override void ICLPreExecute()
         {
             Moves.Clear();
             Weights.Clear();
+        }
+
+        public override void PreExecute()
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>

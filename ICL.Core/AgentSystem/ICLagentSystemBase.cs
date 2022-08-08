@@ -16,15 +16,16 @@ namespace ICL.Core.AgentSystem
         /// </summary>
         public List<ICLagentBase> ICLagents = new List<ICLagentBase>();
 
-        ///update environment 
-        //public override void Execute()
-        //{
-        //    base.Execute();
-        //    foreach (ICLcartesianAgent agent in ICLagents)
-        //    {
-        //        agent.Behaviors.
-        //    }
-        //}
+        ///ICL agent base PreExecute
+
+        public virtual void ICLPreExecute()
+        {
+            foreach (ICLagentBase agent in Agents)
+            {
+                agent.ICLPreExecute();
+            }
+        }
+
 
     }
 }

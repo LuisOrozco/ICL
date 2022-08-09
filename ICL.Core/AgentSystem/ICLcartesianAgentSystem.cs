@@ -1,9 +1,12 @@
 ﻿using Grasshopper.Kernel.Geometry;
 using Grasshopper.Kernel.Geometry.Delaunay;
 using Grasshopper.Kernel.Geometry.Voronoi;
+
 using ICD.AbmFramework.Core.Agent;
 using ICD.AbmFramework.Core.AgentSystem;
+
 using ICL.Core.Environment;
+
 using Rhino;
 using Rhino.Geometry;
 using System.Collections.Generic;

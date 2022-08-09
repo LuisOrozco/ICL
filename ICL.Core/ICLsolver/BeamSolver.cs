@@ -9,6 +9,8 @@ using Rhino.Geometry;
 using ICD.AbmFramework.Core.AgentSystem;
 using ICD.AbmFramework.Core;
 using ICD.AbmFramework.Core.Agent;
+
+using ICL.Core.AgentBehaviors;
 //using ICD.AbmFramework.Core.Solver;
 
 using ICL.Core.AgentSystem;
@@ -25,27 +27,45 @@ namespace ICL.Core.ICLsolver
             //IterationCount++;
 
             foreach (AgentSystemBase agentSystem in this.AgentSystems)
+                if (!agentSystem.IsFinished()) agentSystem.PreExecute();
+
+            foreach (AgentSystemBase agentSystem in AgentSystems)
             {
-                agentSystem.PreExecute();
+                if (!agentSystem.IsFinished())
+                {
+                    agentSystem.Execute();
+                    foreach (CartesianAgent agent in agentSystem.Agents)
+                    {
+                        RhinoApp.WriteLine(agent.Moves.Count + "moves");
+                    }
+                }
+
             }
-            //    the parent class classes ABM methods not ICL.rewrite this part as well
 
+            foreach (AgentSystemBase agentSystem in AgentSystems)
+            {
+                if (!agentSystem.IsFinished())
+                {
+                    agentSystem.PostExecute();
+                    foreach (CartesianAgent agent in agentSystem.Agents)
+                    {
+                        Point3d pt = agent.Position;
+                        RhinoApp.WriteLine(pt + "position update");
+                    }
+                }
+            }
 
-            //    foreach (ICLagentSystemBase agentSystem in AgentSystems)
-            //        if (!agentSystem.IsFinished()) agentSystem.Execute();
-
-            //    foreach (ICLagentSystemBase agentSystem in AgentSystems)
-            //        if (!agentSystem.IsFinished()) agentSystem.PostExecute();
-
-            //    foreach (ICLcartesianAgentSystem agentSystem in AgentSystems)
+            //foreach (ICLcartesianAgentSystem agentSystem in AgentSystems)
+            //{
+            //    if (!agentSystem.IsFinished())
             //    {
-            //        if (!agentSystem.IsFinished())
-            //        {
-            //            List<Point3d> updatedAgentPositions = UpdatedPositions(agentSystem);
-            //            agentSystem.CartesianEnvironment.AgentStartPositons = updatedAgentPositions;
-            //            agentSystem.CartesianEnvironment.UpdateEnvironment();
-            //        }
+            //        List<Point3d> updatedAgentPositions = UpdatedPositions(agentSystem);
+            //        agentSystem.CartesianEnvironment.AgentStartPositons = updatedAgentPositions;
+            //        agentSystem.CartesianEnvironment.UpdateEnvironment();
+            //    }
+            //}
         }
+
         public List<Point3d> UpdatedPositions(ICLcartesianAgentSystem agentSystem)
         {
             List<Point3d> agentPositionsUpdate = new List<Point3d>();

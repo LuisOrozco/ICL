@@ -94,7 +94,7 @@ namespace ICL.Core.AgentBehaviors
             vec.Unitize();
             Vector3d moveVec = vec * this.SteppingFactor;
             agent.Moves.Add(moveVec);
-            double weight = 1;
+            double weight = 1; //make it parametric
             agent.Weights.Add(weight);
             /// <summary>
             /// print check 

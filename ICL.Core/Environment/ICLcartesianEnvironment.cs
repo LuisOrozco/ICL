@@ -71,7 +71,7 @@ namespace ICL.Core.Environment
         public void UpdateEnvironment()
         {
             this.Reset();
-            Execute();
+            this.Execute();
             //call execute
         }
 

@@ -22,12 +22,14 @@ namespace ICL.Core.ICLsolver
     {
 
         /// <summary>  solver with display conduit</summary>
+        public List<Point3d> tempDisp = new List<Point3d>();
+
         public void ICLbeamSolverExecute()
         {
-            //IterationCount++;
+            IterationCount++;
 
             foreach (AgentSystemBase agentSystem in this.AgentSystems)
-                if (!agentSystem.IsFinished()) agentSystem.PreExecute();
+            if (!agentSystem.IsFinished()) agentSystem.PreExecute();
 
             foreach (AgentSystemBase agentSystem in AgentSystems)
             {
@@ -55,15 +57,22 @@ namespace ICL.Core.ICLsolver
                 }
             }
 
-            //foreach (ICLcartesianAgentSystem agentSystem in AgentSystems)
-            //{
-            //    if (!agentSystem.IsFinished())
-            //    {
-            //        List<Point3d> updatedAgentPositions = UpdatedPositions(agentSystem);
-            //        agentSystem.CartesianEnvironment.AgentStartPositons = updatedAgentPositions;
-            //        agentSystem.CartesianEnvironment.UpdateEnvironment();
-            //    }
-            //}
+            foreach (ICLcartesianAgentSystem agentSystem in AgentSystems)
+            {
+                if (!agentSystem.IsFinished())
+                {
+                    List<Point3d> updatedAgentPositions = UpdatedPositions(agentSystem);
+                    agentSystem.CartesianEnvironment.AgentPositions = updatedAgentPositions;
+                    agentSystem.CartesianEnvironment.UpdateEnvironment();
+                    Dictionary<int, List<Point3d>> testupdate = agentSystem.CartesianEnvironment.NodalDisplacement;
+                    //this.tempDisp = new List<Point3d>();
+                    foreach (List<Point3d> points in testupdate.Values)
+                    {
+                        //RhinoApp.WriteLine(points.Count + "count");
+                        this.tempDisp.Add(points[1]);
+                    }
+                }
+            }
         }
 
         public List<Point3d> UpdatedPositions(ICLcartesianAgentSystem agentSystem)

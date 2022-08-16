@@ -67,6 +67,7 @@
   <ItemGroup>
     <Compile Include="AgentBehaviors\MaxDisplacementBehavior.cs" />
     <Compile Include="AgentSystem\ICLcartesianAgentSystem.cs" />
+    <Compile Include="ICLsolver\RunBeamSolver.cs" />
     <Compile Include="test\Wheel.cs" />
     <Compile Include="test\Car.cs" />
     <Compile Include="Utilities\BeamInitializeAgents.cs" />

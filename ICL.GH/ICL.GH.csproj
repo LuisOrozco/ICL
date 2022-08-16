@@ -6,7 +6,7 @@
     <Title>ICL.GH</Title>
     <Description>Description of ICL.GH</Description>
     <TargetExt>.gha</TargetExt>
-    <BaseOutputPath>C:\Users\ukeer\GitHub\ICL\ICL.GH\bin\Debug\net48</BaseOutputPath>
+    <BaseOutputPath>C:\Users\ukeer\GitHub\ICL\ICL.GH\bin\Debug\net48\Debug\net452</BaseOutputPath>
   </PropertyGroup>
 	
   <ItemGroup>

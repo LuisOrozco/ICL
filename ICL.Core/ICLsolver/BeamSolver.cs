@@ -24,24 +24,40 @@ namespace ICL.Core.ICLsolver
         /// <summary>  solver with display conduit</summary>
         public List<Point3d> tempDisp = new List<Point3d>();
 
+        public BeamSolver(List<AgentSystemBase> agentSystems) : base(agentSystems)
+        {
+        }
+
         public void ICLbeamSolverExecute()
         {
             IterationCount++;
 
+            //Check update
+            foreach (ICLcartesianAgentSystem agentSystem in this.AgentSystems)
+            {
+                foreach (CartesianAgent pos in agentSystem.Agents)
+                {
+                    RhinoApp.WriteLine(pos.Position + "RESTART_POSITION");
+                }
+
+                Dictionary<int, List<Point3d>> nodalDisp = agentSystem.CartesianEnvironment.NodalDisplacement;
+                List<double> displacementsZ = new List<double>();
+                foreach (List<Point3d> pts in nodalDisp.Values)
+                {
+                    displacementsZ.Add(pts[1][2]);
+                    RhinoApp.WriteLine(pts[1][2] + "RESTART_NODALDISP");
+                }
+            }
+
             foreach (AgentSystemBase agentSystem in this.AgentSystems)
-            if (!agentSystem.IsFinished()) agentSystem.PreExecute();
+                if (!agentSystem.IsFinished()) agentSystem.PreExecute();
 
             foreach (AgentSystemBase agentSystem in AgentSystems)
             {
                 if (!agentSystem.IsFinished())
                 {
                     agentSystem.Execute();
-                    foreach (CartesianAgent agent in agentSystem.Agents)
-                    {
-                        RhinoApp.WriteLine(agent.Moves.Count + "moves");
-                    }
                 }
-
             }
 
             foreach (AgentSystemBase agentSystem in AgentSystems)
@@ -49,11 +65,6 @@ namespace ICL.Core.ICLsolver
                 if (!agentSystem.IsFinished())
                 {
                     agentSystem.PostExecute();
-                    foreach (CartesianAgent agent in agentSystem.Agents)
-                    {
-                        Point3d pt = agent.Position;
-                        RhinoApp.WriteLine(pt + "position update");
-                    }
                 }
             }
 
@@ -71,6 +82,22 @@ namespace ICL.Core.ICLsolver
                         //RhinoApp.WriteLine(points.Count + "count");
                         this.tempDisp.Add(points[1]);
                     }
+                }
+            }
+
+            foreach (ICLcartesianAgentSystem agentSystem in this.AgentSystems)
+            {
+                foreach (CartesianAgent pos in agentSystem.Agents)
+                {
+                    RhinoApp.WriteLine(pos.Position + "RESET_POSITION");
+                }
+
+                Dictionary<int, List<Point3d>> nodalDisp = agentSystem.CartesianEnvironment.NodalDisplacement;
+                List<double> displacementsZ = new List<double>();
+                foreach (List<Point3d> pts in nodalDisp.Values)
+                {
+                    displacementsZ.Add(pts[1][2]);
+                    RhinoApp.WriteLine(pts[1][2] + "RESET_NODALDISP");
                 }
             }
         }

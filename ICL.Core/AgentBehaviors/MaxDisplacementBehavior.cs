@@ -18,7 +18,7 @@ namespace ICL.Core.AgentBehaviors
         //public variables 
         public Dictionary<int, List<Point3d>> NodalDisplacemenets = new Dictionary<int, List<Point3d>>();
         public Dictionary<int, List<Point3d>> StartNodalDisplacemenets = new Dictionary<int, List<Point3d>>();
-        public double SteppingFactor = 10; //in mm
+        public double SteppingFactor = 5; //in mm
 
         /// Method:0
         /// <summary>
@@ -68,12 +68,10 @@ namespace ICL.Core.AgentBehaviors
                 if (ancestorNodalDisp > descendantNodalDisp)
                 {
                     AddMoves(ancestorNode, columnAgent.Position, columnAgent);
-                    RhinoApp.WriteLine("ancestorNodalDisp");
                 }
                 else if (descendantNodalDisp > ancestorNodalDisp)
                 {
                     AddMoves(descendantNode, columnAgent.Position, columnAgent);
-                    RhinoApp.WriteLine("descendantNodalDisp");
                 }
             }
         }
@@ -94,7 +92,7 @@ namespace ICL.Core.AgentBehaviors
             vec.Unitize();
             Vector3d moveVec = vec * this.SteppingFactor;
             agent.Moves.Add(moveVec);
-            double weight = 1; //make it parametric
+            double weight = 2; //make it parametric
             agent.Weights.Add(weight);
             /// <summary>
             /// print check 

@@ -5,11 +5,11 @@ using System;
 using System.Collections.Generic;
 
 using ICL.Core.AgentSystem;
-using ICL.Core.Agent;
-using ICL.Core.AgentBehaviors;
-using ICL.Core.Solver;
+using ICL.Core.ICLsolver;
+
 
 using ICD.AbmFramework.Core.AgentSystem;
+using ICD.AbmFramework.Core;
 
 
 
@@ -24,8 +24,8 @@ namespace ICL.GH
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        private BeamSolver solver;
-        List<ICLagentSystemBase> iAgentSystems = new List<ICLagentSystemBase>();
+        private BeamSolver beamSolver;
+        List<AgentSystemBase> iAgentSystems = new List<AgentSystemBase>();
 
         private bool justReset = false;
         public GhcSolver()
@@ -60,17 +60,17 @@ namespace ICL.GH
             bool iReset = false;
             DA.GetData("Reset", ref iReset);
 
-            iAgentSystems = new List<ICLagentSystemBase>();
+            iAgentSystems = new List<AgentSystemBase>();
             DA.GetDataList("Agent Systems", iAgentSystems);
 
-            if (iReset || solver == null)
+            if (iReset || beamSolver == null)
             {
-                foreach (ICLcartesianAgentSystem agentSystem in iAgentSystems)
+                foreach (AgentSystemBase agentSystem in iAgentSystems)
                 {
                     agentSystem.Reset();
                 }
 
-                solver = new BeamSolver(iAgentSystems);
+                beamSolver = new BeamSolver(iAgentSystems);
 
                 justReset = true;
 
@@ -78,20 +78,20 @@ namespace ICL.GH
             }
 
             // update agent system list in solver
-            solver.AgentSystems = iAgentSystems;
+            beamSolver.AgentSystems = iAgentSystems;
 
             bool iExecute = false;
             DA.GetData("Execute", ref iExecute);
 
             if (!justReset)
             {
-                solver.ExecuteSingleStep();
+                beamSolver.ICLbeamSolverExecute();
             }
 
             justReset = false;
 
             int isNotFinished = 0;
-            foreach (ICLagentSystemBase agentSystem in iAgentSystems)
+            foreach (AgentSystemBase agentSystem in iAgentSystems)
                 if (!agentSystem.IsFinished()) isNotFinished += 1;
 
             if (iExecute && !iReset && isNotFinished > 0)
@@ -101,11 +101,13 @@ namespace ICL.GH
 
         Conclusion:
 
-            DA.SetDataList("Display Geometries", solver.GetDisplayGeometries());
-            DA.SetDataList("All Agent Systems", solver.AgentSystems);
-            DA.SetData("Iteration Count", solver.IterationCount);
+            DA.SetDataList("Display Geometries", beamSolver.GetDisplayGeometries());
+            DA.SetDataList("All Agent Systems", beamSolver.AgentSystems);
+            DA.SetData("Iteration Count", beamSolver.IterationCount);
         }
 
+        //protected override System.Drawing.Bitmap Icon { get { return Resources.Solver_StepByStep; } }
+        //public override GH_Exposure Exposure { get { return GH_Exposure.quinary; } }
         /// <summary>
         /// The Exposure property controls where in the panel a component icon 
         /// will appear. There are seven possible locations (primary to septenary), 
@@ -122,11 +124,11 @@ namespace ICL.GH
         /// </summary>
         protected override System.Drawing.Bitmap Icon => null;
 
-        /// <summary>
-        /// Each component must have a unique Guid to identify it. 
-        /// It is vital this Guid doesn't change otherwise old ghx files 
-        /// that use the old ID will partially fail during loading.
-        /// </summary>
+        ///// <summary>
+        ///// Each component must have a unique Guid to identify it. 
+        ///// It is vital this Guid doesn't change otherwise old ghx files 
+        ///// that use the old ID will partially fail during loading.
+        ///// </summary>
         public override Guid ComponentGuid => new Guid("BC0BADFB-FA9B-49BF-8305-CE43743CBDD4");
     }
 }

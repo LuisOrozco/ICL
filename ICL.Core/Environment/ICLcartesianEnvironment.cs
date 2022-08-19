@@ -28,6 +28,8 @@ namespace ICL.Core.Environment
         ///beam environment material
         public List<string> BeamMaterial = new List<string>();
 
+        public Model BeamModel;
+
         /// <summary>
         /// Method for initializing global attributes
         /// </summary>
@@ -83,8 +85,8 @@ namespace ICL.Core.Environment
         {
             BeamFEM createBeamEnvironmentFEM = new BeamFEM(this.EnvironmentBoundary, this.AgentPositions, this.BeamLoads, this.BeamMaterial[0]);
             List<Point3> nodes = new List<Point3>();
-            Model beamModelTest = createBeamEnvironmentFEM.ComputeFEM(ref nodes);
-            FEA createBeamEnvironmentFEA = new FEA(beamModelTest, nodes);
+            this.BeamModel = createBeamEnvironmentFEM.ComputeFEM(ref nodes);
+            FEA createBeamEnvironmentFEA = new FEA(this.BeamModel, nodes);
             List<Point3d> nodalDisp = createBeamEnvironmentFEA.ComputeNodalDisplacements();
             List<Point3d> rhNodes = createBeamEnvironmentFEA.ConvertPt3ToPt3d(nodes);
 

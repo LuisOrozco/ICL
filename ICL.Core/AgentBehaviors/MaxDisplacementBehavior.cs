@@ -19,6 +19,8 @@ namespace ICL.Core.AgentBehaviors
         public Dictionary<int, List<Point3d>> NodalDisplacemenets = new Dictionary<int, List<Point3d>>();
         public Dictionary<int, List<Point3d>> StartNodalDisplacemenets = new Dictionary<int, List<Point3d>>();
         public double SteppingFactor = 5; //in mm
+        public Point3d AncestorNodalDisp;
+        public Point3d DescendantNodalDisp;
 
         /// Method:0
         /// <summary>
@@ -60,16 +62,16 @@ namespace ICL.Core.AgentBehaviors
             else if (neighborNodes.Count > 1) //Note this is only suitable for beams or elements with onlz 2 neighbours)reimplement for slab)
             {
                 Point3d ancestorNode = neighborNodes["ancestor"][0];
-                Point3d ancestorNodalDisp = neighborNodes["ancestor"][1];
+                this.AncestorNodalDisp = neighborNodes["ancestor"][1];
 
                 Point3d descendantNode = neighborNodes["descendant"][0];
-                Point3d descendantNodalDisp = neighborNodes["descendant"][1];
+                this.DescendantNodalDisp = neighborNodes["descendant"][1];
 
-                if (ancestorNodalDisp > descendantNodalDisp)
+                if (Math.Abs(this.AncestorNodalDisp.Z) > Math.Abs(this.DescendantNodalDisp.Z))
                 {
                     AddMoves(ancestorNode, columnAgent.Position, columnAgent);
                 }
-                else if (descendantNodalDisp > ancestorNodalDisp)
+                else if (Math.Abs(this.DescendantNodalDisp.Z) > Math.Abs((this.AncestorNodalDisp.Z)))
                 {
                     AddMoves(descendantNode, columnAgent.Position, columnAgent);
                 }

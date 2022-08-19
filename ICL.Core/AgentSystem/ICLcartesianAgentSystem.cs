@@ -1,24 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Grasshopper.Kernel.Geometry;
+﻿using Grasshopper.Kernel.Geometry;
 using Grasshopper.Kernel.Geometry.Delaunay;
 using Grasshopper.Kernel.Geometry.Voronoi;
 
-using Rhino;
-using Rhino.Geometry;
-
-using ICD.AbmFramework.Core.Environments;
+using ICD.AbmFramework.Core.Agent;
+using ICD.AbmFramework.Core.AgentSystem;
 
 using ICL.Core.Environment;
-using ICL.Core.Agent;
+
+using Rhino;
+using Rhino.Geometry;
+using System.Collections.Generic;
 
 namespace ICL.Core.AgentSystem
 {
-    public class ICLcartesianAgentSystem : ICLagentSystemBase
+    public class ICLcartesianAgentSystem : AgentSystemBase
     {
         /// <summary>
         /// The list of Voronoi cells associated with each agent.
@@ -44,17 +39,15 @@ namespace ICL.Core.AgentSystem
         /// <summary>
         /// Construct a new cartesian agent system
         /// </summary>
-        /// <param name="agents">The cartesian agents</param>
-        /// <param name="cartesianEnvironment">The cartesian environment</param>
-        public ICLcartesianAgentSystem(List<ICLcartesianAgent> agents, ICLcartesianEnvironment cartesianEnvironment)
+        public ICLcartesianAgentSystem(List<CartesianAgent> agents, ICLcartesianEnvironment cartesianEnvironment)
         {
             this.CartesianEnvironment = cartesianEnvironment;
-            this.ICLagents = new List<ICLagentBase>();
+            this.Agents = new List<AgentBase>();
             for (int i = 0; i < agents.Count; ++i)
             {
-                agents[i].Ids = i;
+                //agents[i].Id = i;
                 agents[i].AgentSystem = this;
-                this.Agents.Add((ICLagentBase)agents[i]);
+                this.Agents.Add((AgentBase)agents[i]);
             }
             this.IndexCounter = agents.Count;
         }
@@ -69,7 +62,7 @@ namespace ICL.Core.AgentSystem
             if (ComputeVoronoiCells)
             {
                 Node2List nodes = new Node2List();
-                foreach (ICLcartesianAgent agent in this.Agents)
+                foreach (CartesianAgent agent in this.Agents)
                     nodes.Append(new Node2(agent.Position.X, agent.Position.Y));
                 diagram = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Connectivity(nodes, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, false);
                 List<Node2> node2List = new List<Node2>();
@@ -81,12 +74,12 @@ namespace ICL.Core.AgentSystem
             if (ComputeDelaunayConnectivity)
             {
                 Node2List nodes = new Node2List();
-                foreach (ICLcartesianAgent agent in this.Agents)
+                foreach (CartesianAgent agent in this.Agents)
                     nodes.Append(new Node2(agent.Position.X, agent.Position.Y));
                 diagram = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Connectivity(nodes, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, false);
             }
 
-            foreach (ICLagentBase agent in this.Agents)
+            foreach (AgentBase agent in this.Agents)
                 agent.PreExecute();
 
         }
@@ -106,10 +99,10 @@ namespace ICL.Core.AgentSystem
         /// <param> The agent to search from.</param>
         /// <param> The search distance.</param>
         /// <returns>Returns a list containing all neighboring agents within the search distance.</returns>
-        public List<ICLcartesianAgent> FindNeighbors(ICLcartesianAgent agent, double distance)
+        public List<CartesianAgent> FindNeighbors(CartesianAgent agent, double distance)
         {
-            List<ICLcartesianAgent> cartesianAgentList = new List<ICLcartesianAgent>();
-            foreach (ICLcartesianAgent otherAgent in this.Agents)
+            List<CartesianAgent> cartesianAgentList = new List<CartesianAgent>();
+            foreach (CartesianAgent otherAgent in this.Agents)
             {
                 if (agent != otherAgent && agent.Position.DistanceTo(otherAgent.Position) < distance)
                     cartesianAgentList.Add(otherAgent);
@@ -123,15 +116,15 @@ namespace ICL.Core.AgentSystem
         /// </summary>
         /// <param>The agent to search from.</param>
         /// <returns>Returns the list of topologically connected neighboring agents.</returns>
-        public List<ICLcartesianAgent> FindTopologicalNeighbors(ICLcartesianAgent agent)
+        public List<CartesianAgent> FindTopologicalNeighbors(CartesianAgent agent)
         {
-            List<ICLcartesianAgent> cartesianAgentList = new List<ICLcartesianAgent>();
+            List<CartesianAgent> cartesianAgentList = new List<CartesianAgent>();
 
             List<int> connections = diagram.GetConnections(agent.Id);
 
             foreach (int index in connections)
             {
-                cartesianAgentList.Add((ICLcartesianAgent)(this.Agents[index]));
+                cartesianAgentList.Add((CartesianAgent)(this.Agents[index]));
             }
             return cartesianAgentList;
         }

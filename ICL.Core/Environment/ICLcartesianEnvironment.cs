@@ -5,10 +5,10 @@ using ICL.Core.StructuralAnalysis;
 using Karamba.Geometry;
 using Karamba.Models;
 
-
+using ICD.AbmFramework.Core.Environments;
 namespace ICL.Core.Environment
 {
-    public class ICLcartesianEnvironment: ICLenvironmentBase
+    public class ICLcartesianEnvironment : EnvironmentBase
     {
         ///dict of  nodal displacements 
         public Dictionary<int, List<Point3d>> NodalDisplacement = new Dictionary<int, List<Point3d>>();
@@ -71,7 +71,7 @@ namespace ICL.Core.Environment
         public void UpdateEnvironment()
         {
             this.Reset();
-            Execute();
+            this.Execute();
             //call execute
         }
 

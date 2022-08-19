@@ -2,10 +2,10 @@
 using System.Linq;
 using System.Collections.Generic;
 using ICD.AbmFramework.Core.Agent;
+using ICD.AbmFramework.Core.Behavior;
 using ICD.AbmFramework.Core.AgentSystem;
-using ICD.AbmFramework.Core.Environments;
 
-using ICL.Core.Agent;
+
 using ICL.Core.AgentSystem;
 using ICL.Core.Environment;
 using Rhino.Geometry;
@@ -13,12 +13,12 @@ using Rhino;
 
 namespace ICL.Core.AgentBehaviors
 {
-    public class MaxDisplacementBehavior : ICLbehaviorBase
+    public class MaxDisplacementBehavior : BehaviorBase
     {
         //public variables 
         public Dictionary<int, List<Point3d>> NodalDisplacemenets = new Dictionary<int, List<Point3d>>();
         public Dictionary<int, List<Point3d>> StartNodalDisplacemenets = new Dictionary<int, List<Point3d>>();
-        public double SteppingFactor = 100; //in mm
+        public double SteppingFactor = 5; //in mm
 
         /// Method:0
         /// <summary>
@@ -26,7 +26,7 @@ namespace ICL.Core.AgentBehaviors
         /// </summary>
         public override void Execute(AgentBase agent)
         {
-            ICLcartesianAgent columnAgent = (ICLcartesianAgent)agent;
+            CartesianAgent columnAgent = (CartesianAgent)agent;
             ICLcartesianAgentSystem cartesianSystem = (ICLcartesianAgentSystem)(columnAgent.AgentSystem);
             ICLcartesianEnvironment cartesianEnvironment = cartesianSystem.CartesianEnvironment;
 
@@ -68,12 +68,10 @@ namespace ICL.Core.AgentBehaviors
                 if (ancestorNodalDisp > descendantNodalDisp)
                 {
                     AddMoves(ancestorNode, columnAgent.Position, columnAgent);
-                    RhinoApp.WriteLine("ancestorNodalDisp");
                 }
                 else if (descendantNodalDisp > ancestorNodalDisp)
                 {
                     AddMoves(descendantNode, columnAgent.Position, columnAgent);
-                    RhinoApp.WriteLine("descendantNodalDisp");
                 }
             }
         }
@@ -88,12 +86,14 @@ namespace ICL.Core.AgentBehaviors
         /// Point3d: node
         /// CartesianAgent: column agent
         /// </Param>
-        public void AddMoves(Point3d neighbour, Point3d node, ICLcartesianAgent agent)
+        public void AddMoves(Point3d neighbour, Point3d node, CartesianAgent agent)
         {
             Vector3d vec = neighbour - node;
             vec.Unitize();
             Vector3d moveVec = vec * this.SteppingFactor;
             agent.Moves.Add(moveVec);
+            double weight = 2; //make it parametric
+            agent.Weights.Add(weight);
             /// <summary>
             /// print check 
             /// </summary>

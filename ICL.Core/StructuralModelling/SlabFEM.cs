@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ICL.Core.test
+namespace ICL.Core.StructuralModelling
 {
-    public class Car
+    internal class SlabFEM
     {
-        public int b;
     }
 }

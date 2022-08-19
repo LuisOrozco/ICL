@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ICL.Core.AgentSystem;
 
-namespace ICL.Core.test
+namespace ICL.Core.ICLsolver
 {
-    public class Wheel : Car
+    internal class Slab
     {
-        public int a;
     }
 }

@@ -46,6 +46,9 @@
     <Reference Include="ICD.AbmFramework.Core">
       <HintPath>..\..\..\AppData\Roaming\Grasshopper\Libraries\ICD.AbmFramework.Core.dll</HintPath>
     </Reference>
+    <Reference Include="KangarooSolver">
+      <HintPath>..\..\..\..\..\Program Files\Rhino 7\Plug-ins\Grasshopper\Components\KangarooSolver.dll</HintPath>
+    </Reference>
     <Reference Include="KarambaCommon">
       <HintPath>..\..\..\AppData\Roaming\McNeel\Rhinoceros\packages\7.0\Karamba3D\2.2.0.12\KarambaCommon.dll</HintPath>
     </Reference>

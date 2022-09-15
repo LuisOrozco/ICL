@@ -19,12 +19,14 @@ namespace ICL.Core.Utilities
         /// List of Beam boundary points (length will always be 2, not more, not less)
         /// </summary>
         public Curve EnvironmentBoundary;
+        public Mesh SlabGeo;
 
-        public SlabInitializeAgents(int columnNumbers, Curve environmentBoundary)
+        public SlabInitializeAgents(int columnNumbers, Curve environmentBoundary, Mesh slabGeo)
 
         {
             this.ColumnNumbers = columnNumbers;
             this.EnvironmentBoundary = environmentBoundary;
+            this.SlabGeo = slabGeo;
         }
 
         /// <summary>
@@ -45,7 +47,8 @@ namespace ICL.Core.Utilities
                 foreach (var t in tParams)
                 {
                     Point3d pt = this.EnvironmentBoundary.PointAt(t);
-                    columnStartPos.Add(pt);
+                    Point3d posPt = this.SlabGeo.ClosestPoint(pt);
+                    columnStartPos.Add(posPt);
                 }
             }
             return columnStartPos;

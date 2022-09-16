@@ -13,6 +13,7 @@ using Karamba.CrossSections;
 using Karamba.Geometry;
 using Karamba.Utilities;
 using Karamba.Elements;
+using Karamba.Supports;
 
 
 
@@ -20,24 +21,23 @@ namespace ICL.Core.StructuralModelling
 {
     public class SlabFEM
     {
-        //public attributes 
+        ///public attributes 
 
         public double MeshRes = 100;
         public Mesh SlabGeo;
         public List<Point3d> ColumnPositions = new List<Point3d>();
         public Dictionary<int, Point3d> NodalDisplacement = new Dictionary<int, Point3d>();
 
-        //initialize class
+        ///initialize class
         public SlabFEM(Mesh slabGeo, List<Point3d> columnPositions)
         {
             this.SlabGeo = slabGeo;
             this.ColumnPositions = columnPositions;
         }
 
-        public List<BuilderShell> ComputeSlabFEM(ref List<Point3d> dispNodes)
+        public List<Support> ComputeSlabFEM(ref List<Point3d> dispNodes)
         {
             ///Slab geometry modelling =============================================================
-
             List<Mesh3> slabMeshElements = new List<Mesh3>();
             Mesh3 kSlabMesh = new Mesh3();
             slabMeshElements.Add(kSlabMesh);
@@ -134,12 +134,41 @@ namespace ICL.Core.StructuralModelling
             }
             List<BuilderShell> slabElems = k3d.Part.MeshToShell(slabMeshElements, slabElmIds, slabCroSecList, logger, out slabNodes);
 
-
             ///Supports & Loads=====================================================================
+
+            ///column top support 
+            string position = "top";
+            List<List<bool>> supportConditions = CreateSupportCondition(position);
+            List<Support> supports = new List<Support>();
+            for (int i = 0; i < this.ColumnPositions.Count; i++)
+            {
+                Point3 nodePt = new Point3(this.ColumnPositions[i][0], this.ColumnPositions[i][1], this.ColumnPositions[i][2]);
+                Support support = k3d.Support.Support(nodePt, supportConditions[i]);
+                supports.Add(support);
+            }
+
             ///Model==========================================================================
             ///Analyse==========================================================================
 
-            return slabElems;
+            return supports;
+        }
+        /// Method:9
+        /// <summary>
+        /// Method creating Kasramba support conditions
+        /// </summary>
+        /// <returns> List<List<bool>> </returns>
+        public List<List<bool>> CreateSupportCondition(string position)
+        {
+            List<List<bool>> conditions = new List<List<bool>>();
+            for (int i = 0; i < this.ColumnPositions.Count; i++)
+            {
+                if (position == "top")
+                {
+                    List<bool> cond = new List<bool>() { false, true, true, false, false, false };
+                    conditions.Add(cond);
+                }
+            }
+            return conditions;
         }
     }
 }

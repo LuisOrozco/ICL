@@ -14,6 +14,7 @@ using Karamba.Geometry;
 using Karamba.Utilities;
 using Karamba.Elements;
 using Karamba.Supports;
+using Karamba.Loads;
 
 
 
@@ -35,7 +36,7 @@ namespace ICL.Core.StructuralModelling
             this.ColumnPositions = columnPositions;
         }
 
-        public List<Support> ComputeSlabFEM(ref List<Point3d> dispNodes)
+        public List<Load> ComputeSlabFEM(ref List<Point3d> dispNodes)
         {
             ///Slab geometry modelling =============================================================
             List<Mesh3> slabMeshElements = new List<Mesh3>();
@@ -147,12 +148,17 @@ namespace ICL.Core.StructuralModelling
                 supports.Add(support);
             }
 
+            ///Loads==========================================================================
+            var gLoad = k3d.Load.GravityLoad(new Vector3(0, 0, -1));
+            var testUdl = k3d.Load.ConstantForceLoad(Vector3.UnitZ * -1, 10);
+            List<Load> loads = new List<Load>() { gLoad, testUdl };
+
             ///Model==========================================================================
             ///Analyse==========================================================================
 
-            return supports;
+            return loads;
         }
-        /// Method:9
+        /// Method:0
         /// <summary>
         /// Method creating Kasramba support conditions
         /// </summary>

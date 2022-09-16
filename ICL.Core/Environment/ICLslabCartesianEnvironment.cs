@@ -11,6 +11,7 @@ using ICD.AbmFramework.Core.Environments;
 using ICL.Core.StructuralModelling;
 
 using Karamba.Models;
+using Karamba.Loads;
 using Karamba.Supports;
 using Karamba.Materials;
 using Karamba.Geometry;
@@ -64,13 +65,13 @@ namespace ICL.Core.Environment
             this.PreExecute();
         }
 
-        public List<Support> Execute()
+        public List<Load> Execute()
         {
             //create slab FEM class instance
             SlabFEM femModel = new SlabFEM(this.EnvironmentBoundary, this.AgentPositions);
             //compute FEM
             List<Point3d> nodes = new List<Point3d>();
-            List<Support> testMesh = femModel.ComputeSlabFEM(ref nodes);
+            List<Load> testMesh = femModel.ComputeSlabFEM(ref nodes);
 
             return testMesh;
             //compute FEA

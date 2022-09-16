@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using Rhino.Geometry;
 using Rhino;
+using Rhino.Collections;
+using Karamba.Geometry;
 
 namespace ICL.Core.Utilities
 {
@@ -47,8 +49,16 @@ namespace ICL.Core.Utilities
                 foreach (var t in tParams)
                 {
                     Point3d pt = this.EnvironmentBoundary.PointAt(t);
+
+                    List<Point3d> vPtList = new List<Point3d>();
+                    foreach (Point3d p in this.SlabGeo.Vertices)
+                    {
+                        vPtList.Add(p);
+                    }
+                    int ptInd = Point3dList.ClosestIndexInList(vPtList, pt);
+
                     Point3d posPt = this.SlabGeo.ClosestPoint(pt);
-                    columnStartPos.Add(posPt);
+                    columnStartPos.Add(this.SlabGeo.Vertices.Point3dAt(ptInd));
                 }
             }
             return columnStartPos;

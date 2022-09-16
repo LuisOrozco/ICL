@@ -65,13 +65,13 @@ namespace ICL.Core.Environment
             this.PreExecute();
         }
 
-        public List<Load> Execute()
+        public Model Execute()
         {
             //create slab FEM class instance
             SlabFEM femModel = new SlabFEM(this.EnvironmentBoundary, this.AgentPositions);
             //compute FEM
             List<Point3d> nodes = new List<Point3d>();
-            List<Load> testMesh = femModel.ComputeSlabFEM(ref nodes);
+            Model testMesh = femModel.ComputeSlabFEM(ref nodes);
 
             return testMesh;
             //compute FEA

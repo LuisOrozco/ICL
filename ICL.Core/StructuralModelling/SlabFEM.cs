@@ -36,30 +36,30 @@ namespace ICL.Core.StructuralModelling
             this.ColumnPositions = columnPositions;
         }
 
-        public Model ComputeSlabFEM(ref List<Point3d> dispNodes)
+        public Model ComputeSlabFEM(ref List<Point3> dispNodes)
         {
             ///Slab geometry modelling =============================================================
             List<Mesh3> slabMeshElements = new List<Mesh3>();
             Mesh3 kSlabMesh = new Mesh3();
-            slabMeshElements.Add(kSlabMesh);
 
             foreach (MeshFace f in this.SlabGeo.Faces)
             {
                 kSlabMesh.AddFace(f.A, f.B, f.C);
             }
-            foreach (Point3d v in this.SlabGeo.Vertices)
+            foreach (Point3f v in this.SlabGeo.Vertices)
             {
                 kSlabMesh.AddVertex(new Point3(v.X, v.Y, v.Z));
-                dispNodes.Add(v);
+                dispNodes.Add(new Point3(v.X, v.Y, v.Z));
             }
+            slabMeshElements.Add(kSlabMesh);
 
-            ///Columns geometry modelling =============================================================
-            List<Line3> columnLineElements = new List<Line3>();
-            foreach (Point3d pt in ColumnPositions)
-            {
-                Line3 line = new Line3(new Point3(pt.X, pt.Y, pt.Z), new Point3(pt.X, pt.Y, pt.Z - 300));
-                columnLineElements.Add(line);
-            }
+            /////Columns geometry modelling =============================================================
+            //List<Line3> columnLineElements = new List<Line3>();
+            //foreach (Point3d pt in ColumnPositions)
+            //{
+            //    Line3 line = new Line3(new Point3(pt.X, pt.Y, pt.Z), new Point3(pt.X, pt.Y, pt.Z - 300));
+            //    columnLineElements.Add(line);
+            //}
 
             ///Material definition==================================================================
             Karamba.Materials.FemMaterial_Isotrop materials = new Karamba.Materials.FemMaterial_Isotrop(
@@ -75,21 +75,21 @@ namespace ICL.Core.StructuralModelling
             1e-4,
             null);
 
-            ///CrossSectionColumn=========================================================================
-            List<CroSec> croSecList = new List<CroSec>();
-            CroSec_Trapezoid trapCroSec = new CroSec_Trapezoid(
-            "Column",
-            "ColumnCrossSection",
-            null,
-            null,
-            materials,
-            10000,//has to be parameterised
-            10000,
-            10000);
-            foreach (Point3d pt in ColumnPositions)
-            {
-                croSecList.Add(trapCroSec);
-            }
+            /////CrossSectionColumn=========================================================================
+            //List<CroSec> croSecList = new List<CroSec>();
+            //CroSec_Trapezoid trapCroSec = new CroSec_Trapezoid(
+            //"Column",
+            //"ColumnCrossSection",
+            //null,
+            //null,
+            //materials,
+            //10000,//has to be parameterised
+            //10000,
+            //10000);
+            //foreach (Point3d pt in ColumnPositions)
+            //{
+            //    croSecList.Add(trapCroSec);
+            //}
 
             ///CrossSectionSlab=========================================================================
             List<double> eccentricities = new List<double>();
@@ -111,21 +111,28 @@ namespace ICL.Core.StructuralModelling
             eccentricities,
             heights
             );
-            slabCroSecList.Add(croSec_Shell);
-
-            ///Build LineToBeam element=============================================================
-            var k3d = new KarambaCommon.Toolkit();
-            var logger = new MessageLogger();
-            var nodes = new List<Point3>();
-            List<string> elmIds = new List<string>();
-            for (var i = 0; i < this.ColumnPositions.Count; i++)
+            foreach (MeshFace mf in this.SlabGeo.Faces)
             {
-                string id = "e" + i.ToString();
-                elmIds.Add(id);
+                slabCroSecList.Add(croSec_Shell);
             }
-            List<BuilderBeam> columnElems = k3d.Part.LineToBeam(columnLineElements, elmIds, croSecList, logger, out nodes);
+
+
+            /////Build LineToBeam element=============================================================
+            //var k3d = new KarambaCommon.Toolkit();
+            //var logger = new MessageLogger();
+            //var nodes = new List<Point3>();
+            //List<string> elmIds = new List<string>();
+            //for (var i = 0; i < this.ColumnPositions.Count; i++)
+            //{
+            //    string id = "e" + i.ToString();
+            //    elmIds.Add(id);
+            //}
+            //List<BuilderBeam> columnElems = k3d.Part.LineToBeam(columnLineElements, elmIds, croSecList, logger, out nodes);
 
             ///Build MeshToShell element============================================================
+            var k3d = new KarambaCommon.Toolkit();
+            var logger = new MessageLogger();
+            List<string> elmIds = new List<string>();
             List<Point3> slabNodes = new List<Point3>();
             List<string> slabElmIds = new List<string>();
             for (var i = 0; i < kSlabMesh.Faces.Count; i++)
@@ -138,8 +145,7 @@ namespace ICL.Core.StructuralModelling
             ///Supports & Loads=====================================================================
 
             ///column top support 
-            string position = "top";
-            List<List<bool>> supportConditions = CreateSupportCondition(position);
+            List<List<bool>> supportConditions = CreateSupportCondition();
             List<Support> supports = new List<Support>();
             for (int i = 0; i < this.ColumnPositions.Count; i++)
             {
@@ -150,19 +156,18 @@ namespace ICL.Core.StructuralModelling
 
             ///Loads===============================================================================
             var gLoad = k3d.Load.GravityLoad(new Vector3(0, 0, -1));
-            var testUdl = k3d.Load.ConstantForceLoad(Vector3.UnitZ * -1, 10);
-            List<Load> loads = new List<Load>() { gLoad, testUdl };
+            //var testUdl = k3d.Load.ConstantForceLoad(Vector3.UnitZ * -1, 10);
+            List<Vector3> vecList = new List<Vector3>();
+            Vector3 vec = new Vector3(0, 0, -1);
+            vecList.Add(vec);
+            var meshUdl = k3d.Load.MeshLoad(vecList, kSlabMesh);
+            List<Load> loads = new List<Load>() { gLoad, meshUdl };
 
             ///Model===============================================================================
             List<BuilderElement> modelElements = new List<BuilderElement>
             {
                 slabElems[0],
-                columnElems[0]
             };
-            //double mass;
-            //Point3 cog;
-            //bool flag;
-            //string info;
             Model model = k3d.Model.AssembleModel(
             modelElements,
             supports,
@@ -174,8 +179,23 @@ namespace ICL.Core.StructuralModelling
             out bool flag
             );
 
+            ///License=============================================================================
+            ///License check from Clements
+            bool validLicense;
+            string message;
 
-            ///Analyse=============================================================================
+            validLicense = Karamba.Licenses.License.license_is_valid(model, out message);
+            if (!validLicense)
+            {
+                throw new Exception("License not valid: " + message + "\n" + "License Path: " + Karamba.Licenses.License.licensePath());
+            }
+
+            /////Analyse=============================================================================
+            //List<double> max_disp;
+            //List<double> out_g;
+            //List<double> out_comp;
+            //model = k3d.Algorithms.AnalyzeThI(model, out max_disp, out out_g, out out_comp, out message);
+
 
             return model;
         }
@@ -184,14 +204,25 @@ namespace ICL.Core.StructuralModelling
         /// Method creating Kasramba support conditions
         /// </summary>
         /// <returns> List<List<bool>> </returns>
-        public List<List<bool>> CreateSupportCondition(string position)
+        public List<List<bool>> CreateSupportCondition()
         {
             List<List<bool>> conditions = new List<List<bool>>();
             for (int i = 0; i < this.ColumnPositions.Count; i++)
             {
-                if (position == "top")
+                if (i == 0)
                 {
-                    List<bool> cond = new List<bool>() { false, true, true, false, false, false };
+                    List<bool> cond0 = new List<bool>() { false, false, true, false, false, true };
+                    conditions.Add(cond0);
+                }
+                else if (i == 1)
+                {
+                    List<bool> cond1 = new List<bool>() { true, true, true, false, false, true };
+                    conditions.Add(cond1);
+                }
+                else
+                {
+                    var random = new Random();
+                    List<bool> cond = new List<bool>() { (random.Next(2) == 1), (random.Next(2) == 1), true, false, false, true };
                     conditions.Add(cond);
                 }
             }

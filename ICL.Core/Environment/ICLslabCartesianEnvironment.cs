@@ -9,6 +9,7 @@ using Rhino.Geometry;
 using ICD.AbmFramework.Core.Environments;
 
 using ICL.Core.StructuralModelling;
+using ICL.Core.StructuralAnalysis;
 
 using Karamba.Models;
 using Karamba.Loads;
@@ -65,15 +66,24 @@ namespace ICL.Core.Environment
             this.PreExecute();
         }
 
-        public Model Execute()
+        public void Execute()
         {
             //create slab FEM class instance
             SlabFEM femModel = new SlabFEM(this.EnvironmentBoundary, this.AgentPositions);
             //compute FEM
-            List<Point3d> nodes = new List<Point3d>();
-            Model testMesh = femModel.ComputeSlabFEM(ref nodes);
+            List<Point3> nodes = new List<Point3>();
+            this.SlabModel = femModel.ComputeSlabFEM(ref nodes); //note model before analysis
 
-            return testMesh;
+            FEA createSlabEnvironmentFEA = new FEA(this.SlabModel, nodes);
+            List<Point3d> nodalDisp = createSlabEnvironmentFEA.ComputeNodalDisplacements();
+            List<Point3d> rhNodes = createSlabEnvironmentFEA.ConvertPt3ToPt3d(nodes);
+
+            for (int i = 0; i < nodalDisp.Count; i++)
+            {
+                NodalDisplacement.Add(i, new List<Point3d>() { rhNodes[i], nodalDisp[i] });
+            }
+
+            //return createSlabEnvironmentFEA;
             //compute FEA
             //compute Nodal Displacements 
             //create beam nodes 

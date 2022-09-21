@@ -17,6 +17,10 @@ namespace ICL.Core.Utilities
         /// number of columns at start 
         /// </summary>
         public int ColumnNumbers;
+
+        public List<Point3d> ColumnStartPos = new List<Point3d>();
+
+        public List<int> ColumnStartPosIndex = new List<int>();
         /// <summary>
         /// List of Beam boundary points (length will always be 2, not more, not less)
         /// </summary>
@@ -34,9 +38,9 @@ namespace ICL.Core.Utilities
         /// <summary>
         /// Computes the start pos of columns in the slab base on the number of start columns (cann never be 0)
         /// </summary>
-        public List<Point3d> ComputeColumnStartPosSlab()
+        public void ComputeColumnStartPosSlab()
         {
-            List<Point3d> columnStartPos = new List<Point3d>();
+
 
             if (this.ColumnNumbers == 0)
             {
@@ -56,12 +60,13 @@ namespace ICL.Core.Utilities
                         vPtList.Add(p);
                     }
                     int ptInd = Point3dList.ClosestIndexInList(vPtList, pt);
+                    this.ColumnStartPosIndex.Add(ptInd);
 
                     Point3d posPt = this.SlabGeo.ClosestPoint(pt);
-                    columnStartPos.Add(this.SlabGeo.Vertices.Point3dAt(ptInd));
+                    this.ColumnStartPos.Add(this.SlabGeo.Vertices.Point3dAt(ptInd));
                 }
             }
-            return columnStartPos;
+            //return columnStartPos;
         }
         ///column numbers 
         ///environment boundary 

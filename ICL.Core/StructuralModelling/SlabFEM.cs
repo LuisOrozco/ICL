@@ -25,12 +25,12 @@ namespace ICL.Core.StructuralModelling
         ///public attributes 
 
         public double MeshRes = 100;
-        public Mesh SlabGeo;
+        public Mesh3 SlabGeo;
         public List<Point3d> ColumnPositions = new List<Point3d>();
         public Dictionary<int, Point3d> NodalDisplacement = new Dictionary<int, Point3d>();
 
         ///initialize class
-        public SlabFEM(Mesh slabGeo, List<Point3d> columnPositions)
+        public SlabFEM(Mesh3 slabGeo, List<Point3d> columnPositions)
         {
             this.SlabGeo = slabGeo;
             this.ColumnPositions = columnPositions;
@@ -40,26 +40,7 @@ namespace ICL.Core.StructuralModelling
         {
             ///Slab geometry modelling =============================================================
             List<Mesh3> slabMeshElements = new List<Mesh3>();
-            Mesh3 kSlabMesh = new Mesh3();
-
-            foreach (MeshFace f in this.SlabGeo.Faces)
-            {
-                kSlabMesh.AddFace(f.A, f.B, f.C);
-            }
-            foreach (Point3f v in this.SlabGeo.Vertices)
-            {
-                kSlabMesh.AddVertex(new Point3(v.X, v.Y, v.Z));
-                dispNodes.Add(new Point3(v.X, v.Y, v.Z));
-            }
-            slabMeshElements.Add(kSlabMesh);
-
-            /////Columns geometry modelling =============================================================
-            //List<Line3> columnLineElements = new List<Line3>();
-            //foreach (Point3d pt in ColumnPositions)
-            //{
-            //    Line3 line = new Line3(new Point3(pt.X, pt.Y, pt.Z), new Point3(pt.X, pt.Y, pt.Z - 300));
-            //    columnLineElements.Add(line);
-            //}
+            slabMeshElements.Add(this.SlabGeo);
 
             ///Material definition==================================================================
             Karamba.Materials.FemMaterial_Isotrop materials = new Karamba.Materials.FemMaterial_Isotrop(
@@ -75,28 +56,12 @@ namespace ICL.Core.StructuralModelling
             1e-4,
             null);
 
-            /////CrossSectionColumn=========================================================================
-            //List<CroSec> croSecList = new List<CroSec>();
-            //CroSec_Trapezoid trapCroSec = new CroSec_Trapezoid(
-            //"Column",
-            //"ColumnCrossSection",
-            //null,
-            //null,
-            //materials,
-            //10000,//has to be parameterised
-            //10000,
-            //10000);
-            //foreach (Point3d pt in ColumnPositions)
-            //{
-            //    croSecList.Add(trapCroSec);
-            //}
-
             ///CrossSectionSlab=========================================================================
             List<double> eccentricities = new List<double>();
             List<double> heights = new List<double>();
             List<FemMaterial> slabMaterial = new List<FemMaterial>();
             slabMaterial.Add(materials);
-            foreach (MeshFace mf in this.SlabGeo.Faces)
+            foreach (Face3 mf in this.SlabGeo.Faces)
             {
                 eccentricities.Add(0.0);
                 heights.Add(25); //beam thickness here
@@ -111,23 +76,10 @@ namespace ICL.Core.StructuralModelling
             eccentricities,
             heights
             );
-            foreach (MeshFace mf in this.SlabGeo.Faces)
+            foreach (Face3 mf in this.SlabGeo.Faces)
             {
                 slabCroSecList.Add(croSec_Shell);
             }
-
-
-            /////Build LineToBeam element=============================================================
-            //var k3d = new KarambaCommon.Toolkit();
-            //var logger = new MessageLogger();
-            //var nodes = new List<Point3>();
-            //List<string> elmIds = new List<string>();
-            //for (var i = 0; i < this.ColumnPositions.Count; i++)
-            //{
-            //    string id = "e" + i.ToString();
-            //    elmIds.Add(id);
-            //}
-            //List<BuilderBeam> columnElems = k3d.Part.LineToBeam(columnLineElements, elmIds, croSecList, logger, out nodes);
 
             ///Build MeshToShell element============================================================
             var k3d = new KarambaCommon.Toolkit();
@@ -135,7 +87,7 @@ namespace ICL.Core.StructuralModelling
             List<string> elmIds = new List<string>();
             List<Point3> slabNodes = new List<Point3>();
             List<string> slabElmIds = new List<string>();
-            for (var i = 0; i < kSlabMesh.Faces.Count; i++)
+            for (var i = 0; i < this.SlabGeo.Faces.Count; i++)
             {
                 string id = "se" + i.ToString();
                 elmIds.Add(id);
@@ -156,11 +108,10 @@ namespace ICL.Core.StructuralModelling
 
             ///Loads===============================================================================
             var gLoad = k3d.Load.GravityLoad(new Vector3(0, 0, -1));
-            //var testUdl = k3d.Load.ConstantForceLoad(Vector3.UnitZ * -1, 10);
             List<Vector3> vecList = new List<Vector3>();
             Vector3 vec = new Vector3(0, 0, -1);
             vecList.Add(vec);
-            var meshUdl = k3d.Load.MeshLoad(vecList, kSlabMesh);
+            var meshUdl = k3d.Load.MeshLoad(vecList, this.SlabGeo);
             List<Load> loads = new List<Load>() { gLoad, meshUdl };
 
             ///Model===============================================================================
@@ -189,13 +140,6 @@ namespace ICL.Core.StructuralModelling
             {
                 throw new Exception("License not valid: " + message + "\n" + "License Path: " + Karamba.Licenses.License.licensePath());
             }
-
-            /////Analyse=============================================================================
-            //List<double> max_disp;
-            //List<double> out_g;
-            //List<double> out_comp;
-            //model = k3d.Algorithms.AnalyzeThI(model, out max_disp, out out_g, out out_comp, out message);
-
 
             return model;
         }

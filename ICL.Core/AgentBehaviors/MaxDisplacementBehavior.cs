@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+
 using ICD.AbmFramework.Core.Agent;
 using ICD.AbmFramework.Core.Behavior;
 using ICD.AbmFramework.Core.AgentSystem;
-
 
 using ICL.Core.AgentSystem;
 using ICL.Core.Environment;

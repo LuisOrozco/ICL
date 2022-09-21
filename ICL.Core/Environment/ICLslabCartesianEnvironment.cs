@@ -33,7 +33,7 @@ namespace ICL.Core.Environment
         public List<Point3d> AgentStartPositons = new List<Point3d>();
 
         ///beam environment boundary points
-        public Mesh EnvironmentBoundary;
+        public Mesh3 EnvironmentMesh;
 
         ///beam environment loads
         public List<string> SlabLoads = new List<string>();
@@ -43,10 +43,10 @@ namespace ICL.Core.Environment
 
         public Model SlabModel;
 
-        public ICLslabCartesianEnvironment(List<Point3d> agentPositions, Mesh environmentBoundary, List<string> beamLoads, List<string> beamMaterial)
+        public ICLslabCartesianEnvironment(List<Point3d> agentPositions, Mesh3 environmentMesh, List<string> beamLoads, List<string> beamMaterial)
         {
             this.AgentPositions = this.AgentStartPositons = agentPositions;
-            this.EnvironmentBoundary = environmentBoundary;
+            this.EnvironmentMesh = environmentMesh;
             this.SlabLoads = beamLoads;
             this.SlabMaterial = beamMaterial;
         }
@@ -69,12 +69,12 @@ namespace ICL.Core.Environment
         public void Execute()
         {
             //create slab FEM class instance
-            SlabFEM femModel = new SlabFEM(this.EnvironmentBoundary, this.AgentPositions);
+            SlabFEM femModel = new SlabFEM(this.EnvironmentMesh, this.AgentPositions);
             //compute FEM
             List<Point3> nodes = new List<Point3>();
-            this.SlabModel = femModel.ComputeSlabFEM(ref nodes); //note model before analysis
-
-            FEA createSlabEnvironmentFEA = new FEA(this.SlabModel, nodes);
+            Model assemblyModel = femModel.ComputeSlabFEM(ref nodes); //note model before analysis
+            FEA createSlabEnvironmentFEA = new FEA(assemblyModel, nodes);
+            this.SlabModel = createSlabEnvironmentFEA.KarambaModel;
             List<Point3d> nodalDisp = createSlabEnvironmentFEA.ComputeNodalDisplacements();
             List<Point3d> rhNodes = createSlabEnvironmentFEA.ConvertPt3ToPt3d(nodes);
 

@@ -72,9 +72,9 @@ namespace ICL.Core.Environment
             SlabFEM femModel = new SlabFEM(this.EnvironmentMesh, this.AgentPositions);
             //compute FEM
             List<Point3> nodes = new List<Point3>();
-            Model assemblyModel = femModel.ComputeSlabFEM(ref nodes); //note model before analysis
-            FEA createSlabEnvironmentFEA = new FEA(assemblyModel, nodes);
-            this.SlabModel = createSlabEnvironmentFEA.KarambaModel;
+            this.SlabModel = femModel.ComputeSlabFEM(ref nodes); //note model before analysis
+            FEA createSlabEnvironmentFEA = new FEA(this.SlabModel, nodes);
+
             List<Point3d> nodalDisp = createSlabEnvironmentFEA.ComputeNodalDisplacements();
             List<Point3d> rhNodes = createSlabEnvironmentFEA.ConvertPt3ToPt3d(nodes);
 
@@ -88,6 +88,7 @@ namespace ICL.Core.Environment
             //compute Nodal Displacements 
             //create beam nodes 
             //add values to nodaldisplacements dictionary 
+
         }
     }
 }

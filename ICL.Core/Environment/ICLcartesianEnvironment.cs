@@ -87,6 +87,8 @@ namespace ICL.Core.Environment
             List<Point3> nodes = new List<Point3>();
             this.BeamModel = createBeamEnvironmentFEM.ComputeFEM(ref nodes);
             FEA createBeamEnvironmentFEA = new FEA(this.BeamModel, nodes);
+            //this.BeamModel = createBeamEnvironmentFEA.AnalysedModel;
+
             List<Point3d> nodalDisp = createBeamEnvironmentFEA.ComputeNodalDisplacements();
             List<Point3d> rhNodes = createBeamEnvironmentFEA.ConvertPt3ToPt3d(nodes);
 

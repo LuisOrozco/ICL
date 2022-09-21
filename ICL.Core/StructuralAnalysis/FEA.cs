@@ -20,6 +20,7 @@ namespace ICL.Core.StructuralAnalysis
         /// public variables 
         /// </summary>
         public Model KarambaModel;
+        public Model AnalysedModel;
         public List<Point3> Nodes = new List<Point3>();
 
         /// <summary>

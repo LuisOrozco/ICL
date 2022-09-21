@@ -56,7 +56,14 @@ namespace ICL.Core.AgentBehaviors
         //search neighbours 
         public void FindNeighborsSlab(Point3d agentPoistion)
         {
-
+            int agentPositionIndex;
+            for (int i = 0; i < this.SlabGeo.TopologyVertices.Count; i++)
+            {
+                if (agentPoistion.EpsilonEquals(SlabGeo.TopologyVertices[i], 0.001))
+                {
+                    agentPositionIndex = i;
+                }
+            }
             //find vertext index from agent position 
             //find connected points
             //for each connected point find its respective nodal displaceemnt value 

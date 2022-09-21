@@ -41,6 +41,10 @@ namespace ICL.Core.StructuralModelling
             ///Slab geometry modelling =============================================================
             List<Mesh3> slabMeshElements = new List<Mesh3>();
             slabMeshElements.Add(this.SlabGeo);
+            foreach (Point3 v in this.SlabGeo.Vertices)
+            {
+                dispNodes.Add(v);
+            }
 
             ///Material definition==================================================================
             Karamba.Materials.FemMaterial_Isotrop materials = new Karamba.Materials.FemMaterial_Isotrop(

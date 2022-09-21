@@ -20,7 +20,7 @@ namespace ICL.Core.StructuralModelling
     public class BeamFEM
     {
         ///public attributes
-        public double divisionLength = 100;//in mm
+        public double divisionLength = 90;//in mm
         public List<Point3d> BeamLinePoints = new List<Point3d>();
         public List<Point3d> columnPositions = new List<Point3d>();
         public List<string> BeamLoadTypes = new List<string>();
@@ -87,9 +87,9 @@ namespace ICL.Core.StructuralModelling
             null,
             null,
             materials,
-            30,//has to be parameterised
-            100,
-            100);
+            10000,//has to be parameterised
+            10000,
+            10000);
             croSecList.Add(trapCroSec);
             //<summary> adding cross section definition for each line segment o fthe beam </summary>
             foreach (Line3 segment in beamLineElems)

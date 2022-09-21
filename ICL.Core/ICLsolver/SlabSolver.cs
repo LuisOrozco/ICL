@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ICL.Core.ICLsolver
 {
-    internal class Slab
+    internal class SlabSolver
     {
     }
 }

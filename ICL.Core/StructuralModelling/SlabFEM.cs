@@ -144,7 +144,7 @@ namespace ICL.Core.StructuralModelling
             {
                 throw new Exception("License not valid: " + message + "\n" + "License Path: " + Karamba.Licenses.License.licensePath());
             }
-            ///Analyse
+            ///Analyse=============================================================================
             List<double> max_disp;
             List<double> out_g;
             List<double> out_comp;

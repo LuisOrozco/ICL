@@ -61,12 +61,13 @@ namespace ICL.Core.Environment
 
         public void PreExecute()
         {
-            this.Reset();
+            NodalDisplacement.Clear();
         }
 
         public void UpdateEnvironment()
         {
-            this.PreExecute();
+            this.Reset();
+            this.Execute();
         }
 
         public void Execute()

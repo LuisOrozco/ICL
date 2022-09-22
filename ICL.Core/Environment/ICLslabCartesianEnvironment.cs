@@ -35,6 +35,8 @@ namespace ICL.Core.Environment
         ///beam environment boundary points
         public Mesh3 EnvironmentMesh;
 
+        ///beam environment boundary points
+        public List<Point3d> EnvironmentBoundaryPoints = new List<Point3d>();
         ///beam environment loads
         public List<string> SlabLoads = new List<string>();
 
@@ -43,9 +45,10 @@ namespace ICL.Core.Environment
 
         public Model SlabModel;
 
-        public ICLslabCartesianEnvironment(List<Point3d> agentPositions, Mesh3 environmentMesh, List<string> beamLoads, List<string> beamMaterial)
+        public ICLslabCartesianEnvironment(List<Point3d> agentPositions, List<Point3d> environmentBoundaryPoints, Mesh3 environmentMesh, List<string> beamLoads, List<string> beamMaterial)
         {
             this.AgentPositions = this.AgentStartPositons = agentPositions;
+            this.EnvironmentBoundaryPoints = environmentBoundaryPoints;
             this.EnvironmentMesh = environmentMesh;
             this.SlabLoads = beamLoads;
             this.SlabMaterial = beamMaterial;

@@ -39,31 +39,86 @@ namespace ICL.Core.AgentBehaviors
 
             Dictionary<string, List<Point3d>> neighborNodes = new Dictionary<string, List<Point3d>>();
 
-
             if (this.NodalDisplacemenets.Count == 0)
             {
-                //neighborNodes = FindNeightbors(columnAgent.Position, this.StartNodalDisplacemenets, out int agentPosNodeIndex);
+                List<int> agentPosNodeIndex = new List<int>();
+                neighborNodes = FindNeighborsSlab(columnAgent.Position, this.SlabGeo, StartNodalDisplacemenets, ref agentPosNodeIndex);
             }
 
             if (this.NodalDisplacemenets.Count > 0)
             {
-                //neighborNodes = FindNeightbors(columnAgent.Position, this.StartNodalDisplacemenets, out int agentPosNodeIndex);
+                List<int> agentPosNodeIndex = new List<int>();
+                neighborNodes = FindNeighborsSlab(columnAgent.Position, this.SlabGeo, this.NodalDisplacemenets, ref agentPosNodeIndex);
             }
 
+            //get vector to move towards max displacement 
+            List<double> sampleZ = new List<double>();
+            foreach (var item in neighborNodes.Values)
+            {
+                sampleZ.Add(item[1].Z);
+            }
+
+            Double maxZ = sampleZ.Max();
+
+            foreach (var item in neighborNodes.Values)
+            {
+                if (item[1].Z == maxZ)
+                {
+                    AddMoves(item[0], columnAgent.Position, columnAgent);
+                }
+            }
 
         }
+        public void AddMoves(Point3d neighbour, Point3d node, CartesianAgent agent)
+        {
+            Vector3d vec = neighbour - node;
+            vec.Unitize();
+            double vecLength = new Line(neighbour, node).Length;
+            Vector3d moveVec = vec * vecLength;
+            agent.Moves.Add(moveVec);
+            double weight = 2; //make it parametric
+            agent.Weights.Add(weight);
+            ///// <summary>
+            ///// print check 
+            ///// </summary>
+            //RhinoApp.WriteLine(moveVec + "moveVec");
+            //RhinoApp.WriteLine(agent.Moves + "columnAgent.Moves");
+        }
+
         //Method add moves 
         //search neighbours 
-        public void FindNeighborsSlab(Point3d agentPoistion)
+        public Dictionary<string, List<Point3d>> FindNeighborsSlab(Point3d agentPoistion, Mesh mesh, Dictionary<int, List<Point3d>> displacementsDict, ref List<int> agentPosInd)
         {
-            int agentPositionIndex;
+            List<int> agentPositionIndex = new List<int>();
             for (int i = 0; i < this.SlabGeo.TopologyVertices.Count; i++)
             {
                 if (agentPoistion.EpsilonEquals(SlabGeo.TopologyVertices[i], 0.001))
                 {
-                    agentPositionIndex = i;
+                    agentPositionIndex.Add(i);
                 }
             }
+            agentPosInd.Add(agentPositionIndex[0]);
+            int[] neighborInd = mesh.TopologyVertices.ConnectedTopologyVertices(agentPositionIndex[0]);
+            List<Point3d> connectedVertices = new List<Point3d>();
+            foreach (int i in neighborInd)
+            {
+                Point3d pt = mesh.Vertices.Point3dAt(i);
+                connectedVertices.Add(pt);
+            }
+
+            Dictionary<string, List<Point3d>> neighborNodes = new Dictionary<string, List<Point3d>>();
+            for (int i = 0; i < connectedVertices.Count; i++)
+            {
+                foreach (var item in displacementsDict.Values)
+                {
+                    if (connectedVertices[i] == item[0])
+                    {
+                        neighborNodes.Add(i.ToString(), new List<Point3d>() { item[0], item[1] });
+                    }
+                }
+            }
+
+            return neighborNodes;
             //find vertext index from agent position 
             //find connected points
             //for each connected point find its respective nodal displaceemnt value 

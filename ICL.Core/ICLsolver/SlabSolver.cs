@@ -48,10 +48,11 @@ namespace ICL.Core.ICLsolver
                     RhinoApp.WriteLine(pts[1][2] + "RESTART_NODALDISP");
                 }
             }
-
+            //PreExecute===============================================================================================
             foreach (AgentSystemBase agentSystem in this.AgentSystems)
                 if (!agentSystem.IsFinished()) agentSystem.PreExecute();
 
+            //Execute===============================================================================================
             foreach (AgentSystemBase agentSystem in AgentSystems)
             {
                 if (!agentSystem.IsFinished())
@@ -59,7 +60,7 @@ namespace ICL.Core.ICLsolver
                     agentSystem.Execute();
                 }
             }
-
+            //PostExecute===============================================================================================
             foreach (AgentSystemBase agentSystem in AgentSystems)
             {
                 if (!agentSystem.IsFinished())
@@ -67,7 +68,7 @@ namespace ICL.Core.ICLsolver
                     agentSystem.PostExecute();
                 }
             }
-
+            ///Environment Update===============================================================================================
             foreach (ICLslabCartesianAgentSystem agentSystem in AgentSystems)
             {
                 if (!agentSystem.IsFinished())
@@ -76,15 +77,13 @@ namespace ICL.Core.ICLsolver
                     agentSystem.CartesianEnvironment.AgentPositions = updatedAgentPositions;
                     agentSystem.CartesianEnvironment.UpdateEnvironment();
                     Dictionary<int, List<Point3d>> testupdate = agentSystem.CartesianEnvironment.NodalDisplacement;
-                    //this.tempDisp = new List<Point3d>();
                     foreach (List<Point3d> points in testupdate.Values)
                     {
-                        //RhinoApp.WriteLine(points.Count + "count");
                         this.tempDisp.Add(points[1]);
                     }
                 }
             }
-
+            ///Print Test===============================================================================================
             foreach (ICLslabCartesianAgentSystem agentSystem in this.AgentSystems)
             {
                 foreach (CartesianAgent pos in agentSystem.Agents)

@@ -144,6 +144,11 @@ namespace ICL.Core.StructuralModelling
             {
                 throw new Exception("License not valid: " + message + "\n" + "License Path: " + Karamba.Licenses.License.licensePath());
             }
+            ///Analyse
+            List<double> max_disp;
+            List<double> out_g;
+            List<double> out_comp;
+            model = k3d.Algorithms.AnalyzeThI(model, out max_disp, out out_g, out out_comp, out message);
 
             return model;
         }

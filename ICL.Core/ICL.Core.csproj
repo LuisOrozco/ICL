@@ -70,6 +70,7 @@
   <ItemGroup>
     <Compile Include="AgentBehaviors\SlabMaxDisplacementBehavior.cs" />
     <Compile Include="AgentBehaviors\MaxDisplacementBehavior.cs" />
+    <Compile Include="AgentSystem\ICLslabCartesianAgentSystem.cs" />
     <Compile Include="AgentSystem\ICLcartesianAgentSystem.cs" />
     <Compile Include="Environment\ICLslabCartesianEnvironment.cs" />
     <Compile Include="ICLsolver\SlabSolver.cs" />

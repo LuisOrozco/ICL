@@ -68,15 +68,15 @@ namespace ICL.Core.AgentBehaviors
                     Point3d node = columnAgent.Position;
                     CartesianAgent cAgent = columnAgent;
                     Vector3d vec = neighbor - node;
-                    vec.Unitize();
+            vec.Unitize();
                     double vecLength = new Line(neighbor, node).Length;
-                    Vector3d moveVec = vec * vecLength;
+            Vector3d moveVec = vec * vecLength;
                     cAgent.Moves.Add(moveVec);
-                    double weight = 2; //make it parametric
+            double weight = 2; //make it parametric
                     cAgent.Weights.Add(weight);
-                    ///// <summary>
-                    ///// print check 
-                    ///// </summary>
+            ///// <summary>
+            ///// print check 
+            ///// </summary>
                     ////(moveVec + "moveVec");
                     ////(agent.Moves + "columnAgent.Moves");
                 }

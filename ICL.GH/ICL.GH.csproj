@@ -17,8 +17,9 @@
   
   <ItemGroup>
     <PackageReference Include="ABxM.Core" Version="1.5.4" />
-    <PackageReference Include="Grasshopper" Version="6.35.21222.17001" IncludeAssets="compile;build" />
+    <PackageReference Include="Grasshopper" Version="7.35.23346.11001" IncludeAssets="compile;build" />
     <PackageReference Include="KarambaCommon" Version="2.2.0.144" />
+    <PackageReference Include="RhinoCommon" Version="7.35.23346.11001" />
   </ItemGroup>
   
   <ItemGroup>

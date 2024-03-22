@@ -26,7 +26,7 @@ namespace ICL.Core.AgentSystem
         /// <summary>
         /// The field to access the Cartesian environment of this agent system.
         /// </summary>
-        public ICLcartesianEnvironment CartesianEnvironment;
+        public ICLBeamEnvironment CartesianEnvironment;
         /// <summary>
         /// Boolean toggle to determine if Voronoi diagram should be computed for this system.
         /// </summary>
@@ -39,7 +39,7 @@ namespace ICL.Core.AgentSystem
         /// <summary>
         /// Construct a new cartesian agent system
         /// </summary>
-        public ICLcartesianAgentSystem(List<CartesianAgent> agents, ICLcartesianEnvironment cartesianEnvironment)
+        public ICLcartesianAgentSystem(List<CartesianAgent> agents, ICLBeamEnvironment cartesianEnvironment)
         {
             this.CartesianEnvironment = cartesianEnvironment;
             this.Agents = new List<AgentBase>();

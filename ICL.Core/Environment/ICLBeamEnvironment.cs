@@ -6,12 +6,13 @@ using Karamba.Geometry;
 using Karamba.Models;
 
 using ABxM.Core.Environments;
+using System.Linq;
 namespace ICL.Core.Environment
 {
-    public class ICLcartesianEnvironment : EnvironmentBase
+    public class ICLBeamEnvironment : EnvironmentBase
     {
         ///dict of  nodal displacements 
-        public Dictionary<int, List<Point3d>> NodalDisplacement = new Dictionary<int, List<Point3d>>();
+        public Dictionary<int, double> NodalDisplacement = new Dictionary<int, double>();
 
         ///list of positions of the agent 
         public List<Point3d> AgentPositions = new List<Point3d>();
@@ -38,7 +39,7 @@ namespace ICL.Core.Environment
         /// environmentBoundary: list of Rhino.Geometry.Point3d
         /// beamLoads: list of string 
         /// beamMaterial: List of string</Params>
-        public ICLcartesianEnvironment(List<Point3d> agentPositions, List<Point3d> environmentBoundary, List<string> beamLoads, List<string> beamMaterial)
+        public ICLBeamEnvironment(List<Point3d> agentPositions, List<Point3d> environmentBoundary, List<string> beamLoads, List<string> beamMaterial)
         {
             this.AgentStartPositons = this.AgentPositions = agentPositions;
             this.EnvironmentBoundary = environmentBoundary;
@@ -89,12 +90,12 @@ namespace ICL.Core.Environment
             FEA createBeamEnvironmentFEA = new FEA(this.BeamModel, nodes);
             //this.BeamModel = createBeamEnvironmentFEA.AnalysedModel;
 
-            List<Point3d> nodalDisp = createBeamEnvironmentFEA.ComputeNodalDisplacements();
-            List<Point3d> rhNodes = createBeamEnvironmentFEA.ConvertPt3ToPt3d(nodes);
+            List<double>nodalDispDist = createBeamEnvironmentFEA.ComputeNodalDisplacements();
+            List<Point3d> rhNodes = nodes.Select(pt => new Point3d(pt[0], pt[1], pt[2])).ToList();
 
-            for (int i = 0; i < nodalDisp.Count; i++)
+            for (int i = 0; i < nodalDispDist.Count; i++)
             {
-                NodalDisplacement.Add(i, new List<Point3d>() { rhNodes[i], nodalDisp[i] });
+                NodalDisplacement.Add(i, nodalDispDist[i]);
             }
         }
 

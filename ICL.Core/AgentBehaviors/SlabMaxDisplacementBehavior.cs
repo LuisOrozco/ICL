@@ -31,8 +31,8 @@ namespace ICL.Core.AgentBehaviors
         public override void Execute(AgentBase agent)
         {
             CartesianAgent columnAgent = (CartesianAgent)agent;
-            ICLslabCartesianAgentSystem cartesianSystem = (ICLslabCartesianAgentSystem)(columnAgent.AgentSystem);
-            ICLslabCartesianEnvironment cartesianEnvironment = cartesianSystem.CartesianEnvironment;
+            ICLSlabAgentSystem cartesianSystem = (ICLSlabAgentSystem)(columnAgent.AgentSystem);
+            ICLSlabEnvironment cartesianEnvironment = cartesianSystem.CartesianEnvironment;
 
             //get nodal displacements from the ICLcartesianEnvironment here 
             this.NodalDisplacemenets = cartesianEnvironment.NodalDisplacement;

@@ -95,10 +95,9 @@ public class InitialiseEnv : GH_ScriptInstance
     /// Output parameters as ref arguments. You don't have to assign output parameters,
     /// they will have a default value.
     /// </summary>
-    private void RunScript(List<Point3d> iBoundaryCorners, List<Point3d> iColumnStartPos, Mesh iEnvMesh, List<string> iLoads, List<string> iMaterial, ref object oCartEnv, ref object oMeshEnv)
+    private void RunScript(List<Point3d> iBoundaryCorners, List<Point3d> iColumnStartPos, Mesh iEnvMesh, List<string> iLoads, List<string> iMaterial, ref object oCartEnv)
     {
         CartesianEnvironment cartEnv = new CartesianEnvironment(iBoundaryCorners);
-        MeshEnvironment meshEnv = new MeshEnvironment(iEnvMesh);
         Mesh3 envMesh = iEnvMesh.Convert();
         // Create an instance of the SlabFEM class
         SlabFEM femModel = new SlabFEM(envMesh, iColumnStartPos);
@@ -111,32 +110,22 @@ public class InitialiseEnv : GH_ScriptInstance
         FEA slabEnvironmentFEA = new FEA(slabModel, nodes);
 
         // Compute nodal displacements
-        List<Point3d> nodalDisplacements = slabEnvironmentFEA.ComputeNodalDisplacements();
+        List<double> nodalDisplacements = slabEnvironmentFEA.ComputeNodalDisplacements();
 
         // Convert Point3 nodes to Point3d
-        List<Point3d> rhinoNodes = slabEnvironmentFEA.ConvertPt3ToPt3d(nodes);
+        List<Point3d> rhinoNodes = nodes.Select(pt => new Point3d(pt[0], pt[1], pt[2])).ToList();
 
-        List<Dictionary<string, object>> dictList = new List<Dictionary<string, object>>();
-        Dictionary<string, object> originalPoints = new Dictionary<string, object>();
-        Dictionary<string, object> displacedPoints = new Dictionary<string, object>();
-        Dictionary<string, object> tupleDict = new Dictionary<string, object>();
+        Dictionary<string, object> displacedDict = new Dictionary<string, object>();
 
         for (int i = 0; i < nodalDisplacements.Count; i++)
         {
-            originalPoints.Add(i.ToString(), rhinoNodes[i]);
-            displacedPoints.Add(i.ToString(), nodalDisplacements[i]);
-            Tuple<Point3d, Point3d> nodeData = new Tuple<Point3d, Point3d>(rhinoNodes[i], nodalDisplacements[i]);
-            tupleDict.Add(i.ToString(), nodeData);
-
+            double displacement = nodalDisplacements[i];
+            displacedDict.Add(i.ToString(), displacement);
         }
-        dictList.Add(originalPoints);
-        dictList.Add(displacedPoints);
 
-        cartEnv.CustomData = tupleDict;
-        meshEnv.CustomData = displacedPoints;
+        cartEnv.CustomData = displacedDict;
 
         oCartEnv = cartEnv;
-        oMeshEnv = meshEnv;
     }
 
     public override void InvokeRunScript(IGH_Component owner, object rhinoDocument, int iteration, List<object> inputs, IGH_DataAccess DA)

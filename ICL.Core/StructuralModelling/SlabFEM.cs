@@ -24,7 +24,6 @@ namespace ICL.Core.StructuralModelling
     {
         ///public attributes 
 
-        public double MeshRes = 100;
         public Mesh3 SlabGeo;
         public List<Point3d> ColumnPositions = new List<Point3d>();
         public Dictionary<int, Point3d> NodalDisplacement = new Dictionary<int, Point3d>();

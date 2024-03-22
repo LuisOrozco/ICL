@@ -78,9 +78,9 @@
     <Compile Include="AgentBehaviors\SlabMaxDisplacementBehavior.cs" />
     <Compile Include="AgentPos\BeamInitializeAgents.cs" />
     <Compile Include="AgentSystem\ICLcartesianAgentSystem.cs" />
-    <Compile Include="AgentSystem\ICLslabCartesianAgentSystem.cs" />
-    <Compile Include="Environment\ICLcartesianEnvironment.cs" />
-    <Compile Include="Environment\ICLslabCartesianEnvironment.cs" />
+    <Compile Include="AgentSystem\ICLSlabAgentSystem.cs" />
+    <Compile Include="Environment\ICLBeamEnvironment.cs" />
+    <Compile Include="Environment\ICLSlabEnvironment.cs" />
     <Compile Include="ICLsolver\BeamSolver.cs" />
     <Compile Include="ICLsolver\SlabSolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

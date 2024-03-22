@@ -33,7 +33,7 @@ namespace ICL.Core.ICLsolver
             IterationCount++;
 
             //Check update
-            foreach (ICLslabCartesianAgentSystem agentSystem in this.AgentSystems)
+            foreach (ICLSlabAgentSystem agentSystem in this.AgentSystems)
             {
                 foreach (CartesianAgent pos in agentSystem.Agents)
                 {
@@ -69,7 +69,7 @@ namespace ICL.Core.ICLsolver
                 }
             }
             ///Environment Update===============================================================================================
-            foreach (ICLslabCartesianAgentSystem agentSystem in AgentSystems)
+            foreach (ICLSlabAgentSystem agentSystem in AgentSystems)
             {
                 if (!agentSystem.IsFinished())
                 {
@@ -84,7 +84,7 @@ namespace ICL.Core.ICLsolver
                 }
             }
             ///Print Test===============================================================================================
-            foreach (ICLslabCartesianAgentSystem agentSystem in this.AgentSystems)
+            foreach (ICLSlabAgentSystem agentSystem in this.AgentSystems)
             {
                 foreach (CartesianAgent pos in agentSystem.Agents)
                 {
@@ -101,7 +101,7 @@ namespace ICL.Core.ICLsolver
             }
         }
 
-        public List<Point3d> SlabUpdatedPositions(ICLslabCartesianAgentSystem agentSystem)
+        public List<Point3d> SlabUpdatedPositions(ICLSlabAgentSystem agentSystem)
         {
             List<Point3d> agentPositionsUpdate = new List<Point3d>();
 

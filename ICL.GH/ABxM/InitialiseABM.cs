@@ -86,7 +86,7 @@ public class Script_Instance : GH_ScriptInstance
         List<Point3d> agentStartPositions = initializeAgents.ColumnStartPos;
 
         //COMPUTE NODAL DISPLACEMENTS OF THE ENVIRONMENT & DEFINE ICLSlabcartesianEnvironment
-        ICLslabCartesianEnvironment environment = new ICLslabCartesianEnvironment(agentStartPositions, iEnvironmentGeoPoints, kSlabMesh, iLoads, iMaterial);
+        ICLSlabEnvironment environment = new ICLSlabEnvironment(agentStartPositions, iEnvironmentGeoPoints, kSlabMesh, iLoads, iMaterial);
         environment.Execute();
         Dictionary<int, List<Point3d>> startNodalDisplacements = environment.NodalDisplacement;
 
@@ -107,7 +107,7 @@ public class Script_Instance : GH_ScriptInstance
         //DEFINE AGENT SYSTEM
 
         List<AgentSystemBase> casSystems = new List<AgentSystemBase>();
-        ICLslabCartesianAgentSystem csSystem = new ICLslabCartesianAgentSystem(cartesianAgents, environment);
+        ICLSlabAgentSystem csSystem = new ICLslabCartesianAgentSystem(cartesianAgents, environment);
         casSystems.Add(csSystem);
 
         //SOLVER

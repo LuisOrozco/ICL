@@ -16,7 +16,7 @@ namespace ICL.Core.AgentBehaviors
     public class MaxDisplacementBehavior : BehaviorBase
     {
         //public variables 
-        public Dictionary<int, List<Point3d>> NodalDisplacemenets = new Dictionary<int, List<Point3d>>();
+        public Dictionary<int, double> NodalDisplacemenets = new Dictionary<int, double>();
         public Dictionary<int, List<Point3d>> StartNodalDisplacemenets = new Dictionary<int, List<Point3d>>();
         public double SteppingFactor = 5; //in mm
         public Point3d AncestorNodalDisp;
@@ -35,10 +35,9 @@ namespace ICL.Core.AgentBehaviors
             //get nodal displacements from the ICLcartesianEnvironment here 
             this.NodalDisplacemenets = cartesianEnvironment.NodalDisplacement; //will this make the first run empty?
             //identify agent's neighbour node with max displacement 
-            //int agentPosNodeIndex;
-
             Dictionary<string, List<Point3d>> neighborNodes = new Dictionary<string, List<Point3d>>();
             //check to pass startdict or dict
+            neighborNodes = FindNeightbors(columnAgent.Position, this.NodalDisplacemenets, out int agentPosNodeIndex);
 
             if (this.NodalDisplacemenets.Count == 0)
             {

@@ -74,10 +74,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AgentBehaviors\MaxDisplacementBehavior.cs" />
     <Compile Include="AgentBehaviors\SlabMaxDisplacementBehavior.cs" />
     <Compile Include="AgentPos\BeamInitializeAgents.cs" />
-    <Compile Include="AgentSystem\ICLcartesianAgentSystem.cs" />
+    <Compile Include="AgentSystem\ICLBeamAgentSystem.cs" />
     <Compile Include="AgentSystem\ICLSlabAgentSystem.cs" />
     <Compile Include="Environment\ICLBeamEnvironment.cs" />
     <Compile Include="Environment\ICLSlabEnvironment.cs" />

@@ -10,52 +10,32 @@ using ICL.Core.Environment;
 using Rhino;
 using Rhino.Geometry;
 using System.Collections.Generic;
+using ABxM.Core.Environments;
 
 namespace ICL.Core.AgentSystem
 {
-    public class ICLSlabAgentSystem : AgentSystemBase
+    public class ICLSlabAgentSystem : CartesianAgentSystem
     {
-        /// <summary>
-        /// The list of Voronoi cells associated with each agent.
-        /// </summary>
-        public List<Cell2> VoronoiCells = new List<Cell2>();
-        /// <summary>
-        /// The connectivity diagram, i.e. interaction topology, of the agent system.
-        /// </summary>
-        public Connectivity diagram = null;
-        /// <summary>
-        /// The field to access the Cartesian environment of this agent system.
-        /// </summary>
-        public ICLSlabEnvironment CartesianEnvironment;
-        /// <summary>
-        /// Boolean toggle to determine if Voronoi diagram should be computed for this system.
-        /// </summary>
-        public bool ComputeVoronoiCells = false;
-        /// <summary>
-        /// Boolean toggle to determine if only the connectivity diagram should be computed for this system.
-        /// </summary>
-        public bool ComputeDelaunayConnectivity = false;
+
+        public ICLSlabAgentSystem(List<CartesianAgent> agents, CartesianEnvironment cartesianEnvironment) : base(agents, cartesianEnvironment)
+        {
+        }
 
         /// <summary>
         /// Construct a new cartesian agent system
         /// </summary>
-        public ICLSlabAgentSystem(List<CartesianAgent> agents, ICLSlabEnvironment cartesianEnvironment)
-        {
-            this.CartesianEnvironment = cartesianEnvironment;
-            this.Agents = new List<AgentBase>();
-            for (int i = 0; i < agents.Count; ++i)
-            {
-                //agents[i].Id = i;
-                agents[i].AgentSystem = this;
-                this.Agents.Add((AgentBase)agents[i]);
-            }
-            this.IndexCounter = agents.Count;
-        }
-
-        public override void Reset()
-        {
-            base.Reset();
-        }
+        //public ICLSlabAgentSystem(List<CartesianAgent> agents, ICLSlabEnvironment cartesianEnvironment):base(agents, cartesianEnvironment)
+        //{
+        //    this.CartesianEnvironment = cartesianEnvironment;
+        //    this.Agents = new List<AgentBase>();
+        //    for (int i = 0; i < agents.Count; ++i)
+        //    {
+        //        //agents[i].Id = i;
+        //        agents[i].AgentSystem = this;
+        //        this.Agents.Add((AgentBase)agents[i]);
+        //    }
+        //    this.IndexCounter = agents.Count;
+        //}
 
         public override void PreExecute()
         {
@@ -66,7 +46,7 @@ namespace ICL.Core.AgentSystem
                     nodes.Append(new Node2(agent.Position.X, agent.Position.Y));
                 diagram = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Connectivity(nodes, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, false);
                 List<Node2> node2List = new List<Node2>();
-                foreach (Point3d boundaryCorner in this.CartesianEnvironment.EnvironmentBoundaryPoints)
+                foreach (Point3d boundaryCorner in this.CartesianEnvironment.BoundaryCorners)
                     node2List.Add(new Node2(boundaryCorner.X, boundaryCorner.Y));
                 this.VoronoiCells = Grasshopper.Kernel.Geometry.Voronoi.Solver.Solve_Connectivity(nodes, diagram, (IEnumerable<Node2>)node2List);
             }

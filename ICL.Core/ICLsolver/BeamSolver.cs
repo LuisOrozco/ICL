@@ -33,7 +33,7 @@ namespace ICL.Core.ICLsolver
             IterationCount++;
 
             //Check update
-            foreach (ICLcartesianAgentSystem agentSystem in this.AgentSystems)
+            foreach (ICLBeamAgentSystem agentSystem in this.AgentSystems)
             {
                 foreach (CartesianAgent pos in agentSystem.Agents)
                 {
@@ -68,7 +68,7 @@ namespace ICL.Core.ICLsolver
                 }
             }
 
-            foreach (ICLcartesianAgentSystem agentSystem in AgentSystems)
+            foreach (ICLBeamAgentSystem agentSystem in AgentSystems)
             {
                 if (!agentSystem.IsFinished())
                 {
@@ -85,7 +85,7 @@ namespace ICL.Core.ICLsolver
                 }
             }
 
-            foreach (ICLcartesianAgentSystem agentSystem in this.AgentSystems)
+            foreach (ICLBeamAgentSystem agentSystem in this.AgentSystems)
             {
                 foreach (CartesianAgent pos in agentSystem.Agents)
                 {
@@ -102,7 +102,7 @@ namespace ICL.Core.ICLsolver
             }
         }
 
-        public List<Point3d> UpdatedPositions(ICLcartesianAgentSystem agentSystem)
+        public List<Point3d> UpdatedPositions(ICLBeamAgentSystem agentSystem)
         {
             List<Point3d> agentPositionsUpdate = new List<Point3d>();
 

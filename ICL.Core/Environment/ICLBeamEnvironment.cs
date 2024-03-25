@@ -7,12 +7,13 @@ using Karamba.Models;
 
 using ABxM.Core.Environments;
 using System.Linq;
+using System;
 namespace ICL.Core.Environment
 {
     public class ICLBeamEnvironment : EnvironmentBase
     {
         ///dict of  nodal displacements 
-        public Dictionary<int, double> NodalDisplacement = new Dictionary<int, double>();
+        public Dictionary<int, List<Point3d>> NodalDisplacement = new Dictionary<int, List<Point3d>>();
 
         ///list of positions of the agent 
         public List<Point3d> AgentPositions = new List<Point3d>();
@@ -95,7 +96,10 @@ namespace ICL.Core.Environment
 
             for (int i = 0; i < nodalDispDist.Count; i++)
             {
-                NodalDisplacement.Add(i, nodalDispDist[i]);
+                List<Point3d> nodesList = new List<Point3d>();
+                nodesList.Add(rhNodes[i]);
+                nodesList.Add(new Point3d(rhNodes[i].X, rhNodes[i].Y, rhNodes[i].Z - Math.Abs(nodalDispDist[i])));
+                NodalDisplacement.Add(i, nodesList);
             }
         }
 

@@ -22,7 +22,7 @@ namespace ICL.Core.ICLsolver
     {
 
         /// <summary>  solver with display conduit</summary>
-        public List<Point3d> tempDisp = new List<Point3d>();
+        //public List<Point3d> tempDisp = new List<Point3d>();
 
         public SlabSolver(List<AgentSystemBase> agentSystems) : base(agentSystems)
         {
@@ -76,11 +76,13 @@ namespace ICL.Core.ICLsolver
                     List<Point3d> updatedAgentPositions = SlabUpdatedPositions(agentSystem);
                     agentSystem.CartesianEnvironment.AgentPositions = updatedAgentPositions;
                     agentSystem.CartesianEnvironment.UpdateEnvironment();
-                    Dictionary<int, List<Point3d>> testupdate = agentSystem.CartesianEnvironment.NodalDisplacement;
-                    foreach (List<Point3d> points in testupdate.Values)
-                    {
-                        this.tempDisp.Add(points[1]);
-                    }
+
+                    // set "temporary display" points
+                    //Dictionary<int, List<Point3d>> testupdate = agentSystem.CartesianEnvironment.NodalDisplacement;
+                    //foreach (List<Point3d> points in testupdate.Values)
+                    //{
+                    //    this.tempDisp.Add(points[1]);
+                    //}
                 }
             }
             ///Print Test===============================================================================================

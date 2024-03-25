@@ -13,7 +13,7 @@ using System.Collections.Generic;
 
 namespace ICL.Core.AgentSystem
 {
-    public class ICLcartesianAgentSystem : AgentSystemBase
+    public class ICLBeamAgentSystem : AgentSystemBase
     {
         /// <summary>
         /// The list of Voronoi cells associated with each agent.
@@ -39,7 +39,7 @@ namespace ICL.Core.AgentSystem
         /// <summary>
         /// Construct a new cartesian agent system
         /// </summary>
-        public ICLcartesianAgentSystem(List<CartesianAgent> agents, ICLBeamEnvironment cartesianEnvironment)
+        public ICLBeamAgentSystem(List<CartesianAgent> agents, ICLBeamEnvironment cartesianEnvironment)
         {
             this.CartesianEnvironment = cartesianEnvironment;
             this.Agents = new List<AgentBase>();

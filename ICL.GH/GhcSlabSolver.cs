@@ -65,6 +65,8 @@ namespace ICL.GH
 
                 justReset = true;
 
+                // First analysis of slab here?
+
                 goto Conclusion; //JUMPS CODE
             }
 
@@ -109,7 +111,7 @@ namespace ICL.GH
                 return null;
             }
         }
-        public override GH_Exposure Exposure => GH_Exposure.primary;
+        public override GH_Exposure Exposure => GH_Exposure.secondary;
 
         /// <summary>
         /// Provides an Icon for every component that will be visible in the User Interface.

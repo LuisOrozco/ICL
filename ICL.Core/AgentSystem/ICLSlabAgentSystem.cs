@@ -1,21 +1,64 @@
-﻿using Grasshopper.Kernel.Geometry;
-using Grasshopper.Kernel.Geometry.Delaunay;
-using Grasshopper.Kernel.Geometry.Voronoi;
-
-using ABxM.Core.Agent;
-using ABxM.Core.AgentSystem;
-
-using ICL.Core.Environment;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 using Rhino;
 using Rhino.Geometry;
-using System.Collections.Generic;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+
+using System.Data;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Xml;
+using System.Xml.Linq;
+
+using Rhino.Collections;
+using Rhino.DocObjects;
+using Grasshopper.Kernel.Geometry;
+using Grasshopper.Kernel.Geometry.Delaunay;
+using Grasshopper.Kernel.Geometry.Voronoi;
+using GH_IO;
+using GH_IO.Serialization;
+
+using ABxM.Core;
+using ABxM.Core.Agent;
+using ABxM.Core.AgentSystem;
+using ABxM.Core.Behavior;
 using ABxM.Core.Environments;
+using ABxM.Core.Utilities;
+
+using ICL.Core;
+using ICL.Core.AgentBehaviors;
+using ICL.Core.AgentSystem;
+using ICL.Core.Environment;
+using ICL.Core.ICLsolver;
+using ICL.Core.StructuralAnalysis;
+using ICL.Core.StructuralModelling;
+using ICL.Core.Utilities;
+
+using Karamba;
+using Karamba.CrossSections;
+using Karamba.Elements;
+using Karamba.Geometry;
+using Karamba.Loads;
+using Karamba.Materials;
+using Karamba.Models;
+using Karamba.Supports;
+using Karamba.Utilities;
+using KarambaCommon;
 
 namespace ICL.Core.AgentSystem
 {
     public class ICLSlabAgentSystem : CartesianAgentSystem
     {
+
 
         public ICLSlabAgentSystem(List<CartesianAgent> agents, CartesianEnvironment cartesianEnvironment) : base(agents, cartesianEnvironment)
         {

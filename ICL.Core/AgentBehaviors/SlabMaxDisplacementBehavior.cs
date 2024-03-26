@@ -17,7 +17,7 @@ namespace ICL.Core.AgentBehaviors
     public class SlabMaxDisplacementBehavior : BehaviorBase
     {
         //public variables 
-        public Dictionary<int, double> NodalDisplacemenets = new Dictionary<int, double>();
+        public Dictionary<int, double> NodalDisplacements = new Dictionary<int, double>();
         public Dictionary<int, List<Point3d>> StartNodalDisplacemenets = new Dictionary<int, List<Point3d>>();
         public List<Point3d> VertexNeighbours = new List<Point3d>();
         public Mesh SlabGeo;
@@ -36,7 +36,7 @@ namespace ICL.Core.AgentBehaviors
             ICLSlabEnvironment cartesianEnvironment = (ICLSlabEnvironment)cartesianSystem.CartesianEnvironment;
 
             //get nodal displacements from the ICLcartesianEnvironment here 
-            this.NodalDisplacemenets = cartesianEnvironment.CustomData.ToDictionary(kvp => int.Parse(kvp.Key), kvp => (double)kvp.Value);
+            this.NodalDisplacements = cartesianEnvironment.CustomData.ToDictionary(kvp => int.Parse(kvp.Key), kvp => (double)kvp.Value);
 
             //// Find the index of the agent's position in the mesh's topology vertices
             // Convert Point3d to Point3f
@@ -66,7 +66,7 @@ namespace ICL.Core.AgentBehaviors
 
             foreach (int meshNeighborIndex in meshNeighborIndexes)
             {
-                double thisDisplacement = Math.Abs(NodalDisplacemenets[meshNeighborIndex]);
+                double thisDisplacement = Math.Abs(NodalDisplacements[meshNeighborIndex]);
                 if (thisDisplacement > maxZ)
                 {
                     maxZ = thisDisplacement;

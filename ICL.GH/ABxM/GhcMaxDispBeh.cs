@@ -126,19 +126,10 @@ public class MaxDispBeh : GH_ScriptInstance
         {
             if (!(agent is CartesianAgent cartesianAgent)) return;
             if (!(cartesianAgent.AgentSystem is CartesianAgentSystem system)) return;
-            // the environment is set in the custom code
+            if (!(system.CartesianEnvironment is CartesianEnvironment environment)) return;
 
             // get displacement info from the environment
-            Dictionary<int, Point3d> originalPointDict = new Dictionary<int, Point3d>();
-            Dictionary<int, Point3d> displacedPointDict = new Dictionary<int, Point3d>();
-
-            foreach (KeyValuePair<string, object> kvp in Environment.CustomData)
-            {
-                int.TryParse(kvp.Key, out int key);
-                var nodeData = (Tuple<Point3d, Point3d>)kvp.Value;
-                originalPointDict[key] = nodeData.Item1;
-                displacedPointDict[key] = nodeData.Item2;
-            }
+            Dictionary<int, double> nodalDisplacements = environment.CustomData.ToDictionary(kvp => int.Parse(kvp.Key), kvp => (double)kvp.Value);
 
             //// Find the index of the agent's position in the mesh's topology vertices
             // Convert Point3d to Point3f
@@ -160,39 +151,20 @@ public class MaxDispBeh : GH_ScriptInstance
 
             if (agentPositionIndex == -1) return;
 
-            // Create a dictionary to hold the neighbors and their displacements
-            Dictionary<string, object> neighborTuple = new Dictionary<string, object>();
-            Dictionary<int, List<Point3d>> neighborNodes = new Dictionary<int, List<Point3d>>();
-            Dictionary<int, List<Point3d>> displacedNeighborNodes = new Dictionary<int, List<Point3d>>();
-            List<Point3d> meshNeighbors = new List<Point3d>();
+            // find mesh neighbors in topology
             int[] meshNeighborIndexes = EnvMesh.TopologyVertices.ConnectedTopologyVertices(agentPositionIndex);
-            foreach (int index in meshNeighborIndexes)
-            {
-                meshNeighbors.Add(EnvMesh.Vertices.Point3dAt(index));
-            }
-            foreach (Point3d meshPoint in meshNeighbors)
-            {
-                foreach (KeyValuePair<string, object> kvp in Environment.CustomData)
-                {
-                    var nodeData = (Tuple<Point3d, Point3d>)kvp.Value;
-                    if (meshPoint == nodeData.Item1)
-                    {
-                        neighborTuple.Add(kvp.Key, kvp.Value);
-                    }
-                }
-            }
 
             // Get vector to move towards max displacement
             Point3d targetVertex = Point3d.Unset;
             double maxZ = double.MinValue;
 
-            foreach (KeyValuePair<string, object> kvp in neighborTuple)
+            foreach (int meshNeighborIndex in meshNeighborIndexes)
             {
-                var nodeData = (Tuple<Point3d, Point3d>)kvp.Value;
-                if (Math.Abs(nodeData.Item2.Z) > maxZ)
+                double thisDisplacement = Math.Abs(nodalDisplacements[meshNeighborIndex]);
+                if (thisDisplacement > maxZ)
                 {
-                    targetVertex = nodeData.Item1;
-                    maxZ = Math.Abs(nodeData.Item2.Z);
+                    maxZ = thisDisplacement;
+                    targetVertex = EnvMesh.Vertices[meshNeighborIndex];
                 }
             }
 

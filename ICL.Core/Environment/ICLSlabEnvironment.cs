@@ -37,11 +37,11 @@ namespace ICL.Core.Environment
 
         ///displacements, as a dict<index, deltaZ> is in the CustomData
 
-        public ICLSlabEnvironment(List<Point3d> BoundaryCorners, Mesh3 environmentMesh, List<string> beamLoads, List<string> beamMaterial):base(BoundaryCorners)
+        public ICLSlabEnvironment(List<Point3d> BoundaryCorners, Mesh3 environmentMesh, List<string> slabLoads, List<string> slabMaterial):base(BoundaryCorners)
         {
             this.EnvironmentMesh = environmentMesh;
-            this.SlabLoads = beamLoads;
-            this.SlabMaterial = beamMaterial;
+            this.SlabLoads = slabLoads;
+            this.SlabMaterial = slabMaterial;
         }
 
         public void Reset()

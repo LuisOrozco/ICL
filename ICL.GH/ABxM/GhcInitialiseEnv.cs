@@ -52,6 +52,7 @@ using Karamba.Models;
 using Karamba.Supports;
 using Karamba.Utilities;
 using KarambaCommon;
+using Karamba.Results;
 
 
 
@@ -95,10 +96,10 @@ public class InitialiseEnv : GH_ScriptInstance
     /// Output parameters as ref arguments. You don't have to assign output parameters,
     /// they will have a default value.
     /// </summary>
-    private void RunScript(List<Point3d> iBoundaryCorners, List<Point3d> iColumnStartPos, Mesh iEnvMesh, List<string> iLoads, List<string> iMaterial, ref object oCartEnv)
+    private void RunScript(Mesh iMesh, List<Point3d> iBoundaryCorners, List<Point3d> iColumnStartPos, object iElem, List<object> iLoads, ref object oCartEnv)
     {
         CartesianEnvironment cartEnv = new CartesianEnvironment(iBoundaryCorners);
-        Mesh3 envMesh = iEnvMesh.Convert();
+        Mesh3 envMesh = iMesh.Convert();
         // Create an instance of the SlabFEM class
         SlabFEM femModel = new SlabFEM(envMesh, iColumnStartPos);
 
@@ -106,11 +107,30 @@ public class InitialiseEnv : GH_ScriptInstance
         List<Point3> nodes = new List<Point3>();
         Model slabModel = femModel.ComputeSlabFEM(ref nodes);
 
-        // Create an instance of the FEA class
-        FEA slabEnvironmentFEA = new FEA(slabModel, nodes);
+        //Analysis 
+        var k3d = new Toolkit();
+        List<double> max_disp;
+        List<double> out_g;
+        List<double> out_comp;
+        string message;
+        slabModel = k3d.Algorithms.AnalyzeThI(slabModel, out max_disp, out out_g, out out_comp, out message);
 
-        // Compute nodal displacements
-        List<double> nodalDisplacements = slabEnvironmentFEA.ComputeNodalDisplacements();
+        //NodalDisplacements
+        var trans = new List<List<Vector3>>();
+        var rotat = new List<List<Vector3>>();
+        slabModel = slabModel.Clone();
+        slabModel.cloneElements();
+        string lc_ind = "0";
+        List<int> ids = Enumerable.Range(0, nodes.Count).ToList();
+        NodalDisp.solve(slabModel, lc_ind, ids, out trans, out rotat);
+
+        // Scale Displacement Vectors, and Convert resulting translations into Rhino Vector3d
+        double c = Math.Pow(10, 7);
+        List<Vector3d> dispVectors = trans[0].Select(v => new Vector3d(v.X, v.Y, v.Z / c)).ToList();
+
+        // Compute the displacement distances
+        List<double> nodalDisplacements = dispVectors.Select(vec => vec.Length).ToList();
+
 
         // Convert Point3 nodes to Point3d
         List<Point3d> rhinoNodes = nodes.Select(pt => new Point3d(pt[0], pt[1], pt[2])).ToList();

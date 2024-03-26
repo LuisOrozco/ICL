@@ -15,7 +15,7 @@ using ABxM.Core;
 
 namespace ICL.GH
 {
-    public class GhcSolver : GH_Component
+    public class GhcBeamSolver : GH_Component
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -28,10 +28,13 @@ namespace ICL.GH
         List<AgentSystemBase> iAgentSystems = new List<AgentSystemBase>();
 
         private bool justReset = false;
-        public GhcSolver()
-          : base("step-by-step Solver", "BeamSolver",
-            "Execute Structural ABM model step-by-step",
-            "Curve", "BeamSolver")
+        public GhcBeamSolver()
+          : base(
+            "ICL Beam Solver", 
+            "BeamSolver",
+            "Execute ICL Beam model step-by-step",
+            "ABxM", 
+            "ICL")
         {
         }
 

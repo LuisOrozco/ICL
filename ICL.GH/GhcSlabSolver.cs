@@ -15,12 +15,15 @@ namespace ICL.GH
         /// </summary>
         private SlabSolver slabSolver;
         List<AgentSystemBase> iAgentSystems = new List<AgentSystemBase>();
-
         private bool justReset = false;
+
         public GhcSlabSolver()
-          : base("MyComponent1", "SlabSolver",
-              "Description",
-              "Curve", "SlabSolver")
+          : base(
+            "ICL Slab Solver", 
+            "SlabSolver",
+            "Execute the ICL Column agent system by a single step",
+            "ABxM", 
+            "ICL")
         {
         }
 

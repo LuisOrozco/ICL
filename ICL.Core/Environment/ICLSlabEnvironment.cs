@@ -49,11 +49,11 @@ namespace ICL.Core.Environment
             CustomData.Clear();
         }
 
-        //public void UpdateEnvironment()
-        //{
-        //    this.Reset();
-        //    this.Execute();
-        //}
+        public void UpdateEnvironment()
+        {
+            this.Reset();
+            this.Execute();
+        }
 
         public void Execute()
         {

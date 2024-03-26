@@ -10,6 +10,7 @@ using ABxM.Core.AgentSystem;
 using ABxM.Core;
 using ABxM.Core.Agent;
 
+using ICL.Core.Environment;
 using ICL.Core.AgentBehaviors;
 //using ABxM.Core.Solver;
 
@@ -33,49 +34,36 @@ namespace ICL.Core.ICLsolver
             IterationCount++;
 
             //Check update
-            foreach (ICLSlabAgentSystem agentSystem in this.AgentSystems)
-            {
-                foreach (CartesianAgent pos in agentSystem.Agents)
-                {
-                    //(pos.Position + "RESTART_POSITION");
-                }
+            //foreach (ICLSlabAgentSystem agentSystem in this.AgentSystems)
+            //{
 
-                Dictionary<int, List<Point3d>> nodalDisp = agentSystem.CartesianEnvironment.NodalDisplacement;
-                List<double> displacementsZ = new List<double>();
-                foreach (List<Point3d> pts in nodalDisp.Values)
-                {
-                    displacementsZ.Add(pts[1][2]);
-                    //(pts[1][2] + "RESTART_NODALDISP");
-                }
-            }
+            //    Dictionary<int, List<Point3d>> nodalDisp = agentSystem.CartesianEnvironment.NodalDisplacement;
+            //    List<double> displacementsZ = new List<double>();
+            //    foreach (List<Point3d> pts in nodalDisp.Values)
+            //    {
+            //        displacementsZ.Add(pts[1][2]);
+            //        //(pts[1][2] + "RESTART_NODALDISP");
+            //    }
+            //}
             //PreExecute===============================================================================================
-            foreach (AgentSystemBase agentSystem in this.AgentSystems)
+            foreach (AgentSystemBase agentSystem in AgentSystems)
                 if (!agentSystem.IsFinished()) agentSystem.PreExecute();
 
             //Execute===============================================================================================
             foreach (AgentSystemBase agentSystem in AgentSystems)
-            {
-                if (!agentSystem.IsFinished())
-                {
-                    agentSystem.Execute();
-                }
-            }
+                if (!agentSystem.IsFinished()) agentSystem.Execute();
+
             //PostExecute===============================================================================================
             foreach (AgentSystemBase agentSystem in AgentSystems)
-            {
-                if (!agentSystem.IsFinished())
-                {
-                    agentSystem.PostExecute();
-                }
-            }
+                if (!agentSystem.IsFinished()) agentSystem.PostExecute();
+
             ///Environment Update===============================================================================================
             foreach (ICLSlabAgentSystem agentSystem in AgentSystems)
             {
                 if (!agentSystem.IsFinished())
                 {
-                    List<Point3d> updatedAgentPositions = SlabUpdatedPositions(agentSystem);
-                    agentSystem.CartesianEnvironment.AgentPositions = updatedAgentPositions;
-                    agentSystem.CartesianEnvironment.UpdateEnvironment();
+                    //List<Point3d> updatedAgentPositions = agentSystem.Agents.OfType<CartesianAgent>().Select(agent => agent.Position).ToList();
+                    ((ICLSlabEnvironment)agentSystem.CartesianEnvironment).UpdateEnvironment();
 
                     // set "temporary display" points
                     //Dictionary<int, List<Point3d>> testupdate = agentSystem.CartesianEnvironment.NodalDisplacement;
@@ -86,35 +74,22 @@ namespace ICL.Core.ICLsolver
                 }
             }
             ///Print Test===============================================================================================
-            foreach (ICLSlabAgentSystem agentSystem in this.AgentSystems)
-            {
-                foreach (CartesianAgent pos in agentSystem.Agents)
-                {
-                    //(pos.Position + "RESET_POSITION");
-                }
+            //foreach (ICLSlabAgentSystem agentSystem in this.AgentSystems)
+            //{
+            //    foreach (CartesianAgent pos in agentSystem.Agents)
+            //    {
+            //        //(pos.Position + "RESET_POSITION");
+            //    }
 
-                Dictionary<int, List<Point3d>> nodalDisp = agentSystem.CartesianEnvironment.NodalDisplacement;
-                List<double> displacementsZ = new List<double>();
-                foreach (List<Point3d> pts in nodalDisp.Values)
-                {
-                    displacementsZ.Add(pts[1][2]);
-                    //(pts[1][2] + "RESET_NODALDISP");
-                }
-            }
+            //    Dictionary<int, List<Point3d>> nodalDisp = agentSystem.CartesianEnvironment.NodalDisplacement;
+            //    List<double> displacementsZ = new List<double>();
+            //    foreach (List<Point3d> pts in nodalDisp.Values)
+            //    {
+            //        displacementsZ.Add(pts[1][2]);
+            //        //(pts[1][2] + "RESET_NODALDISP");
+            //    }
+            //}
         }
-
-        public List<Point3d> SlabUpdatedPositions(ICLSlabAgentSystem agentSystem)
-        {
-            List<Point3d> agentPositionsUpdate = new List<Point3d>();
-
-            foreach (CartesianAgent agent in agentSystem.Agents)
-            {
-                Point3d point = agent.Position;
-                agentPositionsUpdate.Add(point);
-            }
-            return agentPositionsUpdate;
-        }
-
     }
 }
 

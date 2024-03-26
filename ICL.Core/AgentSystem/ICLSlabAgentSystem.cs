@@ -53,103 +53,127 @@ using Karamba.Models;
 using Karamba.Supports;
 using Karamba.Utilities;
 using KarambaCommon;
+using Karamba.Results;
 
 namespace ICL.Core.AgentSystem
 {
     public class ICLSlabAgentSystem : CartesianAgentSystem
     {
+        public Model KarambaModel;
+        public List<BuilderElement> ModelElements;
+        public List<Support> Supports;
+        public List<Load> Loads;
 
-
+        /// <inheritdoc />
         public ICLSlabAgentSystem(List<CartesianAgent> agents, CartesianEnvironment cartesianEnvironment) : base(agents, cartesianEnvironment)
         {
         }
+        
+        /// <inheritdoc />
+        public override void Reset()
+        {
+            base.Reset();
+            KarambaModel = null;
+            CartesianEnvironment.CustomData.Clear();
+        }
 
-        /// <summary>
-        /// Construct a new cartesian agent system
-        /// </summary>
-        //public ICLSlabAgentSystem(List<CartesianAgent> agents, ICLSlabEnvironment cartesianEnvironment):base(agents, cartesianEnvironment)
-        //{
-        //    this.CartesianEnvironment = cartesianEnvironment;
-        //    this.Agents = new List<AgentBase>();
-        //    for (int i = 0; i < agents.Count; ++i)
-        //    {
-        //        //agents[i].Id = i;
-        //        agents[i].AgentSystem = this;
-        //        this.Agents.Add((AgentBase)agents[i]);
-        //    }
-        //    this.IndexCounter = agents.Count;
-        //}
-
+        /// <inheritdoc />
         public override void PreExecute()
         {
-            if (ComputeVoronoiCells)
+            if (CartesianEnvironment.CustomData.Count == 0)
             {
-                Node2List nodes = new Node2List();
-                foreach (CartesianAgent agent in this.Agents)
-                    nodes.Append(new Node2(agent.Position.X, agent.Position.Y));
-                diagram = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Connectivity(nodes, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, false);
-                List<Node2> node2List = new List<Node2>();
-                foreach (Point3d boundaryCorner in this.CartesianEnvironment.BoundaryCorners)
-                    node2List.Add(new Node2(boundaryCorner.X, boundaryCorner.Y));
-                this.VoronoiCells = Grasshopper.Kernel.Geometry.Voronoi.Solver.Solve_Connectivity(nodes, diagram, (IEnumerable<Node2>)node2List);
+                Dictionary<string, object> displDict = this.RunKaramba();
+                CartesianEnvironment.CustomData = displDict;
             }
-
-            if (ComputeDelaunayConnectivity)
-            {
-                Node2List nodes = new Node2List();
-                foreach (CartesianAgent agent in this.Agents)
-                    nodes.Append(new Node2(agent.Position.X, agent.Position.Y));
-                diagram = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Connectivity(nodes, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, false);
-            }
-
-            foreach (AgentBase agent in this.Agents)
-                agent.PreExecute();
-
+            base.PreExecute();
         }
 
-        /// <summary>
-        /// Method for collecting the geometry that should be displayed.
-        /// </summary>+
-        /// <returns>Returns null. Needs to be overridden.</returns>
-        public override List<object> GetDisplayGeometries()
+        public override void PostExecute()
         {
-            return new List<object>();
+            base.PostExecute();
+            Dictionary<string, object> displDict = this.RunKaramba();
+            CartesianEnvironment.CustomData.Clear();
+            CartesianEnvironment.CustomData = displDict;
         }
 
         /// <summary>
-        /// Find all agents that are within the given straight-line distance of the given agent
+        /// Assemble Karamba Model, analyze it, and compute displacements
         /// </summary>
-        /// <param> The agent to search from.</param>
-        /// <param> The search distance.</param>
-        /// <returns>Returns a list containing all neighboring agents within the search distance.</returns>
-        public List<CartesianAgent> FindNeighbors(CartesianAgent agent, double distance)
+        /// <returns>Returns the dictionary of vertex indices and diplacements.</returns>
+        public Dictionary<string, object> RunKaramba()
         {
-            List<CartesianAgent> cartesianAgentList = new List<CartesianAgent>();
-            foreach (CartesianAgent otherAgent in this.Agents)
+            var k3d = new KarambaCommon.Toolkit();
+            // Create support conditions at each agent poistion
+            List<bool> columnSupportCondition = new List<bool>() { true, true, true, false, false, false };
+            List<Support> columnSupports = Agents.Select(agent =>
+                k3d.Support.Support(new Point3(((CartesianAgent)agent).Position.X, ((CartesianAgent)agent).Position.Y, ((CartesianAgent)agent).Position.Z), columnSupportCondition)
+            ).ToList();
+            Supports.AddRange(columnSupports);
+
+            // Build Karamba Model using Assemble
+            Model model = k3d.Model.AssembleModel
+                (
+                    ModelElements,
+                    Supports,
+                    Loads,
+                    out string info,
+                    out double mass,
+                    out Point3 cog,
+                    out info,
+                    out bool flag
+                );
+
+            // Check for Karamba3D License
+            bool validLicense;
+            string licenseMessage;
+
+            validLicense = Karamba.Licenses.License.license_is_valid(model, out licenseMessage);
+            if (!validLicense)
             {
-                if (agent != otherAgent && agent.Position.DistanceTo(otherAgent.Position) < distance)
-                    cartesianAgentList.Add(otherAgent);
+                throw new Exception("License not valid: " + licenseMessage + "\n" + "License Path: " + Karamba.Licenses.License.licensePath());
             }
 
-            return cartesianAgentList;
-        }
+            // Analyze the Karamba Model
+            List<double> max_disp;
+            List<double> out_g;
+            List<double> out_comp;
+            string analyzeMessage;
 
-        /// <summary>
-        /// Find all agents that are topologically connected to a given agent
-        /// </summary>
-        /// <param>The agent to search from.</param>
-        /// <returns>Returns the list of topologically connected neighboring agents.</returns>
-        public List<CartesianAgent> FindTopologicalNeighbors(CartesianAgent agent)
-        {
-            List<CartesianAgent> cartesianAgentList = new List<CartesianAgent>();
+            model = k3d.Algorithms.AnalyzeThI(model, out max_disp, out out_g, out out_comp, out analyzeMessage);
 
-            List<int> connections = diagram.GetConnections(agent.Id);
-
-            foreach (int index in connections)
+            // Update Environment CustomData with new displacements
+            // get all the verices from the environment mesh
+            List<Point3> nodes = new List<Point3>();
+            if (ModelElements.Count > 1) throw new Exception("Too many Shells");
+            else
             {
-                cartesianAgentList.Add((CartesianAgent)(this.Agents[index]));
+                Mesh3 mesh = ((BuilderShell)ModelElements[0]).mesh as Mesh3;
+                if (mesh == null) throw new Exception("not a Mesh3");
+                else
+                {
+                    nodes = new List<Point3>(mesh.Vertices);
+                }
             }
-            return cartesianAgentList;
+            // Calculate Nodal Displacements
+            var trans = new List<List<Vector3>>();
+            var rotat = new List<List<Vector3>>();
+            Model clonedModel = model.Clone();
+            clonedModel.cloneElements();
+            string lc_ind = "0";
+            List<int> ids = Enumerable.Range(0, nodes.Count).ToList();
+            NodalDisp.solve(clonedModel, lc_ind, ids, out trans, out rotat);
+            // Scale Displacement Vectors, and Convert resulting translations into Rhino Vector3d
+            double c = Math.Pow(10, 7);
+            List<Vector3d> dispVectors = trans[0].Select(v => new Vector3d(v.X, v.Y, v.Z / c)).ToList();
+            // Compute the displacement distances
+            List<double> displacementDistances = dispVectors.Select(vec => vec.Length).ToList();
+            Dictionary<string, object> nodalDisplacements = new Dictionary<string, object>();
+
+            for (int i = 0; i < displacementDistances.Count; i++)
+            {
+                nodalDisplacements.Add(i.ToString(), displacementDistances[i]);
+            }
+            return nodalDisplacements;
         }
 
     }

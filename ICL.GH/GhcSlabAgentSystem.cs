@@ -8,6 +8,10 @@ using ICL.Core.ICLsolver;
 using ICL.Core.AgentSystem;
 using ABxM.Core.Agent;
 using ABxM.Core.Environments;
+using Karamba.Elements;
+using Karamba.Supports;
+using Karamba.Loads;
+
 
 namespace ICL.GH
 {
@@ -63,8 +67,17 @@ namespace ICL.GH
             int iDiagram = 0;
             DA.GetData("Compute Diagram", ref iDiagram);
 
-            // check if agents changed
-            bool agentsChanged = false;
+            List<BuilderElement> iModelElements = new List<BuilderElement>();
+            DA.GetDataList("Elements", iModelElements);
+
+            List<Support> iSupports = new List<Support>();
+            DA.GetDataList("Constant Supports", iSupports);
+
+            List<Load> iLoads = new List<Load>();
+            DA.GetDataList("Load", iLoads);
+
+        // check if agents changed
+        bool agentsChanged = false;
             if (agents.Count != iAgents.Count)
             {
                 agentsChanged = true;
@@ -85,10 +98,13 @@ namespace ICL.GH
             // otherwise, update agent system's environment, plate generator and threshold
             if (agentsChanged)
             {
-                agentSystem = new CartesianAgentSystem(agents, iEnvironment);
+                agentSystem = new ICLSlabAgentSystem(agents, iEnvironment);
             }
 
             agentSystem.CartesianEnvironment = iEnvironment;
+            agentSystem.ModelElements = iModelElements;
+            agentSystem.Supports = iSupports;
+            agentSystem.Loads = iLoads;
 
             if (iDiagram == 0 || iDiagram > 2)
             {

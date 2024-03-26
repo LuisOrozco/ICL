@@ -68,7 +68,6 @@ namespace ICL.Core.Environment
             FEA createSlabEnvironmentFEA = new FEA(this.SlabModel, nodes);
 
             List<double> nodalDispDist = createSlabEnvironmentFEA.ComputeNodalDisplacements();
-            List<Point3d> rhNodes = nodes.Select(pt => new Point3d(pt[0], pt[1], pt[2])).ToList();
             Dictionary<string, object> NodalDisplacement = new Dictionary<string, object>();
 
             for (int i = 0; i < nodalDispDist.Count; i++)

@@ -75,15 +75,27 @@ namespace ICL.Core.AgentSystem
             base.Reset();
             KarambaModel = null;
             CartesianEnvironment.CustomData.Clear();
+            Dictionary<string, object> displDict = this.RunKaramba();
+            CartesianEnvironment.CustomData = displDict;
+
         }
 
         /// <inheritdoc />
         public override void PreExecute()
         {
+            if (CartesianEnvironment.CustomData == null)
+            {
+                CartesianEnvironment.CustomData = new Dictionary<string, object>();
+            }
+
+            // Check if CustomData is empty and displDict is not null or empty
             if (CartesianEnvironment.CustomData.Count == 0)
             {
                 Dictionary<string, object> displDict = this.RunKaramba();
-                CartesianEnvironment.CustomData = displDict;
+                if (displDict != null && displDict.Count > 0)
+                {
+                    CartesianEnvironment.CustomData = displDict;
+                }
             }
             base.PreExecute();
         }

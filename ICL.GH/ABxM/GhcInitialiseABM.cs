@@ -91,7 +91,7 @@ public class Script_Instance : GH_ScriptInstance
         Dictionary<int, double> startNodalDisplacements = environment.CustomData.ToDictionary(kvp => int.Parse(kvp.Key), kvp => (double)kvp.Value);
 
         //DEFINE BEHAVIOR
-        SlabMaxDisplacementBehavior maxDispBehavior = new SlabMaxDisplacementBehavior(iEnvironmentSrfGeo);
+        SlabMaxDisplacementBehavior maxDispBehavior = new SlabMaxDisplacementBehavior();
         List<BehaviorBase> agentBehaviors = new List<BehaviorBase>
         {
             maxDispBehavior

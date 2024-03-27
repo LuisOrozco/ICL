@@ -6,11 +6,15 @@ using System.Threading.Tasks;
 
 using ABxM.Core.Behavior;
 using ABxM.Core.Agent;
+using ABxM.Core.Environments;
 
 using ICL.Core.AgentSystem;
 using ICL.Core.Environment;
 using Rhino.Geometry;
 using Rhino;
+using Karamba.GHopper.Geometry;
+using Karamba.Elements;
+using Karamba.Geometry;
 
 namespace ICL.Core.AgentBehaviors
 {
@@ -22,9 +26,8 @@ namespace ICL.Core.AgentBehaviors
         public List<Point3d> VertexNeighbours = new List<Point3d>();
         public Mesh SlabGeo;
 
-        public SlabMaxDisplacementBehavior(Mesh slabGeo)
+        public SlabMaxDisplacementBehavior()
         {
-            SlabGeo = slabGeo;
             Weight = 1.0;
         }
         // Method:0
@@ -33,7 +36,8 @@ namespace ICL.Core.AgentBehaviors
         {
             CartesianAgent cartesianAgent = (CartesianAgent)agent;
             ICLSlabAgentSystem cartesianSystem = (ICLSlabAgentSystem)(cartesianAgent.AgentSystem);
-            ICLSlabEnvironment cartesianEnvironment = (ICLSlabEnvironment)cartesianSystem.CartesianEnvironment;
+            CartesianEnvironment cartesianEnvironment = (CartesianEnvironment)cartesianSystem.CartesianEnvironment;
+            SlabGeo = ((Mesh3)((BuilderShell)cartesianSystem.ModelElements[0]).mesh).Convert();
 
             //get nodal displacements from the ICLcartesianEnvironment here 
             this.NodalDisplacements = cartesianEnvironment.CustomData.ToDictionary(kvp => int.Parse(kvp.Key), kvp => (double)kvp.Value);

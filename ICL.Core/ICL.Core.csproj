@@ -48,6 +48,9 @@
     <Reference Include="KarambaCommon, Version=2.2.0.16, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>..\packages\KarambaCommon.2.2.0.144\lib\net48\KarambaCommon.dll</HintPath>
     </Reference>
+    <Reference Include="karambaGH">
+      <HintPath>..\..\..\..\..\..\Program Files\Rhino 7\Plug-ins\Karamba\karambaGH.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>

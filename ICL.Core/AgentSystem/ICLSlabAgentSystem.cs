@@ -61,12 +61,14 @@ namespace ICL.Core.AgentSystem
     {
         public Model KarambaModel;
         public List<BuilderElement> ModelElements;
-        public List<Support> Supports;
+        public List<Support> ConstantSupports;
+        public List<Support> AllSupports = new List<Support>();
         public List<Load> Loads;
 
         /// <inheritdoc />
         public ICLSlabAgentSystem(List<CartesianAgent> agents, CartesianEnvironment cartesianEnvironment) : base(agents, cartesianEnvironment)
         {
+            AllSupports = new List<Support>();
         }
         
         /// <inheritdoc />
@@ -74,10 +76,10 @@ namespace ICL.Core.AgentSystem
         {
             base.Reset();
             KarambaModel = null;
+            AllSupports.Clear();
             CartesianEnvironment.CustomData.Clear();
             Dictionary<string, object> displDict = this.RunKaramba();
             CartesianEnvironment.CustomData = displDict;
-
         }
 
         /// <inheritdoc />
@@ -120,13 +122,15 @@ namespace ICL.Core.AgentSystem
             List<Support> columnSupports = Agents.Select(agent =>
                 k3d.Support.Support(new Point3(((CartesianAgent)agent).Position.X, ((CartesianAgent)agent).Position.Y, ((CartesianAgent)agent).Position.Z), columnSupportCondition)
             ).ToList();
-            Supports.AddRange(columnSupports);
+            AllSupports.Clear();
+            AllSupports.AddRange(ConstantSupports);
+            AllSupports.AddRange(columnSupports);
 
             // Build Karamba Model using Assemble
             Model model = k3d.Model.AssembleModel
                 (
                     ModelElements,
-                    Supports,
+                    AllSupports,
                     Loads,
                     out string info,
                     out double mass,
@@ -185,6 +189,8 @@ namespace ICL.Core.AgentSystem
             {
                 nodalDisplacements.Add(i.ToString(), displacementDistances[i]);
             }
+
+            KarambaModel = clonedModel;
             return nodalDisplacements;
         }
 

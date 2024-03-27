@@ -48,7 +48,7 @@ namespace ICL.GH
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("Cartesian Agent System", "AS", "The cartesian agent system", GH_ParamAccess.item);
+            pManager.AddGenericParameter("ICL Slab Agent System", "AS", "The ICL slab agent system", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -98,12 +98,18 @@ namespace ICL.GH
             // otherwise, update agent system's environment, plate generator and threshold
             if (agentsChanged)
             {
-                agentSystem = new ICLSlabAgentSystem(agents, iEnvironment);
+                agentSystem = new ICLSlabAgentSystem(agents, iEnvironment)
+                {
+                    CartesianEnvironment = iEnvironment,
+                    ModelElements = iModelElements,
+                    ConstantSupports = iSupports,
+                    Loads = iLoads
+                };
             }
 
             agentSystem.CartesianEnvironment = iEnvironment;
             agentSystem.ModelElements = iModelElements;
-            agentSystem.Supports = iSupports;
+            agentSystem.ConstantSupports = iSupports;
             agentSystem.Loads = iLoads;
 
             if (iDiagram == 0 || iDiagram > 2)
@@ -122,7 +128,7 @@ namespace ICL.GH
                 agentSystem.ComputeVoronoiCells = true;
             }
 
-            DA.SetData("Cartesian Agent System", agentSystem);
+            DA.SetData("ICL Slab Agent System", agentSystem);
         }
 
         /// <summary>

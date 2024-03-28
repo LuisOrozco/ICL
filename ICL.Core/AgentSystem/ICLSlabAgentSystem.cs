@@ -64,13 +64,13 @@ namespace ICL.Core.AgentSystem
         public List<Support> ConstantSupports;
         public List<Support> AllSupports = new List<Support>();
         public List<Load> Loads;
-        public List<int> ExclusionVertices;
+        public List<Curve> ExclusionCurves;
 
         /// <inheritdoc />
         public ICLSlabAgentSystem(List<CartesianAgent> agents, CartesianEnvironment cartesianEnvironment) : base(agents, cartesianEnvironment)
         {
             AllSupports = new List<Support>();
-            ExclusionVertices = new List<int>();
+            ExclusionCurves = new List<Curve>();
         }
         
         /// <inheritdoc />
@@ -79,7 +79,7 @@ namespace ICL.Core.AgentSystem
             base.Reset();
             KarambaModel = null;
             AllSupports.Clear();
-            ExclusionVertices.Clear();
+            ExclusionCurves.Clear();
             CartesianEnvironment.CustomData.Clear();
             Dictionary<string, object> displDict = this.RunKaramba();
             CartesianEnvironment.CustomData = displDict;

@@ -15,6 +15,7 @@ using System.Linq;
 using Karamba.GHopper.Elements;
 using Karamba.GHopper.Supports;
 using Karamba.GHopper.Loads;
+using Rhino.Geometry;
 
 
 namespace ICL.GH
@@ -47,7 +48,7 @@ namespace ICL.GH
             pManager.AddGenericParameter("Elements", "Elem", "Input shells of the model", GH_ParamAccess.list);
             pManager.AddGenericParameter("Constant Supports", "Supports", "Support conditions that will not change when the agent system is run", GH_ParamAccess.list);
             pManager.AddGenericParameter("Load", "Load", "Input loads", GH_ParamAccess.list);
-            pManager.AddIntegerParameter("Exclusion Indexes", "Excl", "Indexes of mesh vertices inside exclusion zone", GH_ParamAccess.list) ;
+            pManager.AddCurveParameter("Exclusion Curves", "Excl", "Curves describing the column exclusion zones", GH_ParamAccess.list) ;
             pManager[6].Optional = true;
         }
 
@@ -90,8 +91,8 @@ namespace ICL.GH
             List<GH_Load> gH_Loads = objLoads.Select(f => (GH_Load)f).ToList();
             iLoads = gH_Loads.Select(f => f.Value).ToList();
 
-            List<int> iExcl = new List<int>();
-            DA.GetDataList("Exclusion Indexes", iExcl);
+            List<Curve> iExcl = new List<Curve>();
+            DA.GetDataList(6, iExcl);
 
         // check if agents changed
         bool agentsChanged = false;
@@ -121,7 +122,7 @@ namespace ICL.GH
                     ModelElements = iModelElements,
                     ConstantSupports = iSupports,
                     Loads = iLoads,
-                    ExclusionVertices = iExcl
+                    ExclusionCurves = iExcl
                 };
             }
 
@@ -129,7 +130,7 @@ namespace ICL.GH
             agentSystem.ModelElements = iModelElements;
             agentSystem.ConstantSupports = iSupports;
             agentSystem.Loads = iLoads;
-            agentSystem.ExclusionVertices = iExcl;
+            agentSystem.ExclusionCurves = iExcl;
 
             if (iDiagram == 0 || iDiagram > 2)
             {

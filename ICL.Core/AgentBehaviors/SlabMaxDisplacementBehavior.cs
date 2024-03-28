@@ -38,6 +38,20 @@ namespace ICL.Core.AgentBehaviors
             ICLSlabAgentSystem cartesianSystem = (ICLSlabAgentSystem)(cartesianAgent.AgentSystem);
             CartesianEnvironment cartesianEnvironment = (CartesianEnvironment)cartesianSystem.CartesianEnvironment;
             SlabGeo = ((Mesh3)((BuilderShell)cartesianSystem.ModelElements[0]).mesh).Convert();
+            
+            // Find indexes of vertixes inside the no column zones
+            List<Curve> exclusonCurves = new List<Curve>(cartesianSystem.ExclusionCurves);
+            List<int> exclusionIndices = new List<int>();
+            for (int i = 0; i < SlabGeo.Vertices.Count; i++)
+            {
+                foreach (Curve exclCurve in exclusonCurves)
+                {
+                    if (exclCurve.Contains(SlabGeo.Vertices[i], Plane.WorldXY, 0.01) == PointContainment.Inside)
+                    {
+                        exclusionIndices.Add(i);
+                    }
+                }
+            }
 
             //get nodal displacements from the ICLcartesianEnvironment here 
             this.NodalDisplacements = cartesianEnvironment.CustomData.ToDictionary(kvp => int.Parse(kvp.Key), kvp => (double)kvp.Value);
@@ -68,7 +82,7 @@ namespace ICL.Core.AgentBehaviors
 
             foreach (int index in meshNeighborIndexes)
             {
-                if (!cartesianSystem.ExclusionVertices.Contains(index))
+                if (!exclusionIndices.Contains(index))
                 {
                     filteredNeighborIndexesList.Add(index);
                 }

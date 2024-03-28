@@ -27,6 +27,7 @@ namespace ICL.GH
         /// </summary>
         ICLSlabAgentSystem agentSystem = null;
         List<CartesianAgent> agents = new List<CartesianAgent>();
+        List<Curve> exclusionCurves = new List<Curve>();
 
         public GhcSlabAgentSystem()
           : base(
@@ -94,11 +95,11 @@ namespace ICL.GH
             List<Curve> iExcl = new List<Curve>();
             DA.GetDataList(6, iExcl);
 
-        // check if agents changed
-        bool agentsChanged = false;
+            // check if agents changed
+            bool inputsChanged = false;
             if (agents.Count != iAgents.Count)
             {
-                agentsChanged = true;
+                inputsChanged = true;
             }
             else
             {
@@ -106,15 +107,32 @@ namespace ICL.GH
                 {
                     if (agents[i] != iAgents[i])
                     {
-                        agentsChanged = true;
+                        inputsChanged = true;
                     }
                 }
             }
             agents = iAgents;
 
+            //check if curves changed
+            if (exclusionCurves.Count != iExcl.Count)
+            {
+                inputsChanged = true;
+            }
+            else
+            {
+                for (int i = 0; i < exclusionCurves.Count; i++)
+                {
+                    if (exclusionCurves[i] != iExcl[i])
+                    {
+                        inputsChanged = true;
+                    }
+                }
+            }
+            exclusionCurves = iExcl;
+
             // if agents changed, create a new agent system
             // otherwise, update agent system's environment, plate generator and threshold
-            if (agentsChanged)
+            if (inputsChanged)
             {
                 agentSystem = new ICLSlabAgentSystem(agents, iEnvironment)
                 {

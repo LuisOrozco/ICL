@@ -64,11 +64,22 @@ namespace ICL.Core.AgentBehaviors
 
             // find mesh neighbors in topology
             int[] meshNeighborIndexes = SlabGeo.TopologyVertices.ConnectedTopologyVertices(agentPositionIndex);
+            List<int> filteredNeighborIndexesList = new List<int>();
+
+            foreach (int index in meshNeighborIndexes)
+            {
+                if (!cartesianSystem.ExclusionVertices.Contains(index))
+                {
+                    filteredNeighborIndexesList.Add(index);
+                }
+            }
+
+            int[] filteredNeighborIndexes = filteredNeighborIndexesList.ToArray();
 
             Point3d targetVertex = Point3d.Unset;
             double maxZ = double.MinValue;
 
-            foreach (int meshNeighborIndex in meshNeighborIndexes)
+            foreach (int meshNeighborIndex in filteredNeighborIndexes)
             {
                 double thisDisplacement = Math.Abs(NodalDisplacements[meshNeighborIndex]);
                 if (thisDisplacement > maxZ)

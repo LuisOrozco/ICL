@@ -11,6 +11,10 @@ using ABxM.Core.Environments;
 using Karamba.Elements;
 using Karamba.Supports;
 using Karamba.Loads;
+using System.Linq;
+using Karamba.GHopper.Elements;
+using Karamba.GHopper.Supports;
+using Karamba.GHopper.Loads;
 
 
 namespace ICL.GH
@@ -43,7 +47,8 @@ namespace ICL.GH
             pManager.AddGenericParameter("Elements", "Elem", "Input shells of the model", GH_ParamAccess.list);
             pManager.AddGenericParameter("Constant Supports", "Supports", "Support conditions that will not change when the agent system is run", GH_ParamAccess.list);
             pManager.AddGenericParameter("Load", "Load", "Input loads", GH_ParamAccess.list);
-
+            pManager.AddIntegerParameter("Exclusion Indexes", "Excl", "Indexes of mesh vertices inside exclusion zone", GH_ParamAccess.list) ;
+            pManager[6].Optional = true;
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
@@ -67,14 +72,26 @@ namespace ICL.GH
             int iDiagram = 0;
             DA.GetData("Compute Diagram", ref iDiagram);
 
+            List<object> objModelElements = new List<object>();
             List<BuilderElement> iModelElements = new List<BuilderElement>();
-            DA.GetDataList("Elements", iModelElements);
+            DA.GetDataList("Elements", objModelElements);
+            List<GH_Element> gH_Elements = objModelElements.Select(f => (GH_Element)f).ToList();
+            iModelElements = gH_Elements.Select(f => f.Value).ToList();
 
+            List<object> objSupports = new List<object>();
             List<Support> iSupports = new List<Support>();
-            DA.GetDataList("Constant Supports", iSupports);
+            DA.GetDataList("Constant Supports", objSupports);
+            List<GH_Support> gH_Supports = objSupports.Select(f => (GH_Support)f).ToList();
+            iSupports = gH_Supports.Select(f => f.Value).ToList();
 
+            List<object> objLoads = new List<object>();
             List<Load> iLoads = new List<Load>();
-            DA.GetDataList("Load", iLoads);
+            DA.GetDataList("Load", objLoads);
+            List<GH_Load> gH_Loads = objLoads.Select(f => (GH_Load)f).ToList();
+            iLoads = gH_Loads.Select(f => f.Value).ToList();
+
+            List<int> iExcl = new List<int>();
+            DA.GetDataList("Exclusion Indexes", iExcl);
 
         // check if agents changed
         bool agentsChanged = false;
@@ -103,7 +120,8 @@ namespace ICL.GH
                     CartesianEnvironment = iEnvironment,
                     ModelElements = iModelElements,
                     ConstantSupports = iSupports,
-                    Loads = iLoads
+                    Loads = iLoads,
+                    ExclusionVertices = iExcl
                 };
             }
 
@@ -111,6 +129,7 @@ namespace ICL.GH
             agentSystem.ModelElements = iModelElements;
             agentSystem.ConstantSupports = iSupports;
             agentSystem.Loads = iLoads;
+            agentSystem.ExclusionVertices = iExcl;
 
             if (iDiagram == 0 || iDiagram > 2)
             {

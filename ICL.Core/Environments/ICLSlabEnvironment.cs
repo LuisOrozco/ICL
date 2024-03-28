@@ -8,8 +8,7 @@ using Rhino.Geometry;
 
 using ABxM.Core.Environments;
 
-using ICL.Core.StructuralModelling;
-using ICL.Core.StructuralAnalysis;
+using ICL.Core.Utilities;
 
 using Karamba.Models;
 using Karamba.Loads;
@@ -20,7 +19,7 @@ using Karamba.CrossSections;
 using Karamba.Elements;
 using ABxM.Core.Agent;
 
-namespace ICL.Core.Environment
+namespace ICL.Core.Environments
 {
     public class ICLSlabEnvironment : CartesianEnvironment
     {

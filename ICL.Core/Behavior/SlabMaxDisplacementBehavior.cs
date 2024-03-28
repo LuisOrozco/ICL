@@ -9,14 +9,14 @@ using ABxM.Core.Agent;
 using ABxM.Core.Environments;
 
 using ICL.Core.AgentSystem;
-using ICL.Core.Environment;
+using ICL.Core.Environments;
 using Rhino.Geometry;
 using Rhino;
 using Karamba.GHopper.Geometry;
 using Karamba.Elements;
 using Karamba.Geometry;
 
-namespace ICL.Core.AgentBehaviors
+namespace ICL.Core.Behavior
 {
     public class SlabMaxDisplacementBehavior : BehaviorBase
     {

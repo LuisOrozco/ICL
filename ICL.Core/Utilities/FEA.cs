@@ -12,7 +12,7 @@ using Karamba.Results;
 using Rhino;
 using Rhino.Geometry;
 
-namespace ICL.Core.StructuralAnalysis
+namespace ICL.Core.Utilities
 {
     public class FEA
     {

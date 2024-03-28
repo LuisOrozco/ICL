@@ -9,7 +9,7 @@ using Rhino;
 using Rhino.Collections;
 using Karamba.Geometry;
 
-namespace ICL.Core.Utilities
+namespace ICL.Core.Agent
 {
     public class SlabInitializeAgents
     {

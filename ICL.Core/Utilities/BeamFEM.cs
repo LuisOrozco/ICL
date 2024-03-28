@@ -15,7 +15,7 @@ using Rhino;
 /// <summary>
 /// do the FEM parrt like you used to
 /// </summary>
-namespace ICL.Core.StructuralModelling
+namespace ICL.Core.Utilities
 {
     public class BeamFEM
     {

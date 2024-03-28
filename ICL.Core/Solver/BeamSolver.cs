@@ -10,13 +10,12 @@ using ABxM.Core.AgentSystem;
 using ABxM.Core;
 using ABxM.Core.Agent;
 
-using ICL.Core.AgentBehaviors;
-//using ABxM.Core.Solver;
+using ICL.Core.Behavior;
 
 using ICL.Core.AgentSystem;
 
 
-namespace ICL.Core.ICLsolver
+namespace ICL.Core
 {
     public class BeamSolver : Solver
     {

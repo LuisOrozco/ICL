@@ -77,20 +77,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AgentBehaviors\SlabMaxDisplacementBehavior.cs" />
-    <Compile Include="AgentPos\BeamInitializeAgents.cs" />
+    <Compile Include="Behavior\SlabMaxDisplacementBehavior.cs" />
     <Compile Include="AgentSystem\ICLBeamAgentSystem.cs" />
     <Compile Include="AgentSystem\ICLSlabAgentSystem.cs" />
-    <Compile Include="Environment\ICLBeamEnvironment.cs" />
-    <Compile Include="Environment\ICLSlabEnvironment.cs" />
-    <Compile Include="ICLsolver\BeamSolver.cs" />
-    <Compile Include="ICLsolver\SlabSolver.cs" />
+    <Compile Include="Environments\ICLBeamEnvironment.cs" />
+    <Compile Include="Environments\ICLSlabEnvironment.cs" />
+    <Compile Include="Solver\BeamSolver.cs" />
+    <Compile Include="Solver\SlabSolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StructuralAnalysis\FEA.cs" />
-    <Compile Include="StructuralModelling\BeamFEM.cs" />
-    <Compile Include="StructuralModelling\SlabFEM.cs" />
-    <Compile Include="Utilities\BeamInitializeAgents.cs" />
-    <Compile Include="Utilities\SlabInitializeAgents.cs" />
+    <Compile Include="Utilities\FEA.cs" />
+    <Compile Include="Utilities\BeamFEM.cs" />
+    <Compile Include="Utilities\SlabFEM.cs" />
+    <Compile Include="Agent\BeamInitializeAgents.cs" />
+    <Compile Include="Agent\SlabInitializeAgents.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

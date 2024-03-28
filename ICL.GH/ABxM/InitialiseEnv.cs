@@ -32,12 +32,9 @@ using ABxM.Core.Environments;
 using ABxM.Core.Utilities;
 
 using ICL.Core;
-using ICL.Core.AgentBehaviors;
+using ICL.Core.Behavior;
 using ICL.Core.AgentSystem;
-using ICL.Core.Environment;
-using ICL.Core.ICLsolver;
-using ICL.Core.StructuralAnalysis;
-using ICL.Core.StructuralModelling;
+using ICL.Core.Environments;
 using ICL.Core.Utilities;
 
 using Karamba;
@@ -53,7 +50,6 @@ using Karamba.Supports;
 using Karamba.Utilities;
 using KarambaCommon;
 using Karamba.Results;
-
 
 
 /// <summary>

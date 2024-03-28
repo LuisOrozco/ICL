@@ -11,9 +11,9 @@ using ABxM.Core.Agent;
 using ABxM.Core.AgentSystem;
 using ABxM.Core.Behavior;
 using ABxM.Core.Environments;
-using ICL.Core.AgentBehaviors;
+using ICL.Core.Behavior;
 
-namespace ICL.GH
+namespace ICL.GH.GhComponents
 {
     public class GhcMaxDisplBeh : GH_Component
     {

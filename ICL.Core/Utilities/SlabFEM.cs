@@ -18,7 +18,7 @@ using Karamba.Loads;
 
 
 
-namespace ICL.Core.StructuralModelling
+namespace ICL.Core.Utilities
 {
     public class SlabFEM
     {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Grasshopper.Kernel;
 
 using ABxM.Core.AgentSystem;
-using ICL.Core.ICLsolver;
+using ICL.Core;
 using ICL.Core.AgentSystem;
 using ABxM.Core.Agent;
 using ABxM.Core.Environments;
@@ -18,7 +18,7 @@ using Karamba.GHopper.Loads;
 using Rhino.Geometry;
 
 
-namespace ICL.GH
+namespace ICL.GH.GhComponents
 {
     public class GhcSlabAgentSystem : GH_Component
     {

@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
 using Rhino.Geometry;
-using ICL.Core.StructuralModelling;
-using ICL.Core.StructuralAnalysis;
+using ICL.Core.Utilities;
+using ICL.Core.Utilities;
 using Karamba.Geometry;
 using Karamba.Models;
 
 using ABxM.Core.Environments;
 using System.Linq;
 using System;
-namespace ICL.Core.Environment
+
+namespace ICL.Core.Environments
 {
     public class ICLBeamEnvironment : EnvironmentBase
     {

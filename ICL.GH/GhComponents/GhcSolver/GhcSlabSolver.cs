@@ -1,38 +1,27 @@
-using Grasshopper;
-using Grasshopper.Kernel;
-using Rhino.Geometry;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-using ICL.Core.AgentSystem;
-using ICL.Core.ICLsolver;
-
+using Grasshopper.Kernel;
 
 using ABxM.Core.AgentSystem;
-using ABxM.Core;
+using ICL.Core;
 
-
-
-namespace ICL.GH
+namespace ICL.GH.GhComponents
 {
-    public class GhcBeamSolver : GH_Component
+    public class GhcSlabSolver : GH_Component
     {
         /// <summary>
-        /// Each implementation of GH_Component must provide a public 
-        /// constructor without any arguments.
-        /// Category represents the Tab in which the component will appear, 
-        /// Subcategory the panel. If you use non-existing tab or panel names, 
-        /// new tabs/panels will automatically be created.
+        /// Initializes a new instance of the MyComponent1 class.
         /// </summary>
-        private BeamSolver beamSolver;
+        private SlabSolver slabSolver;
         List<AgentSystemBase> iAgentSystems = new List<AgentSystemBase>();
-
         private bool justReset = false;
-        public GhcBeamSolver()
+
+        public GhcSlabSolver()
           : base(
-            "ICL Beam Solver", 
-            "BeamSolver",
-            "Execute ICL Beam model step-by-step",
+            "ICL Slab Solver", 
+            "SlabSolver",
+            "Execute the ICL Column agent system by a single step",
             "ABxM", 
             "ICL")
         {
@@ -56,8 +45,7 @@ namespace ICL.GH
         /// <summary>
         /// This is the method that actually does the work.
         /// </summary>
-        /// <param name="DA">The DA object can be used to retrieve data from input parameters and 
-        /// to store data in output parameters.</param>
+        /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             bool iReset = false;
@@ -66,29 +54,31 @@ namespace ICL.GH
             iAgentSystems = new List<AgentSystemBase>();
             DA.GetDataList("Agent Systems", iAgentSystems);
 
-            if (iReset || beamSolver == null)
+            if (iReset || slabSolver == null)
             {
                 foreach (AgentSystemBase agentSystem in iAgentSystems)
                 {
                     agentSystem.Reset();
                 }
 
-                beamSolver = new BeamSolver(iAgentSystems);
+                slabSolver = new SlabSolver(iAgentSystems);
 
                 justReset = true;
+
+                // First analysis of slab here?
 
                 goto Conclusion; //JUMPS CODE
             }
 
             // update agent system list in solver
-            beamSolver.AgentSystems = iAgentSystems;
+            slabSolver.AgentSystems = iAgentSystems;
 
             bool iExecute = false;
             DA.GetData("Execute", ref iExecute);
 
             if (!justReset)
             {
-                beamSolver.ICLbeamSolverExecute();
+                slabSolver.ICLslabSolverExecute();
             }
 
             justReset = false;
@@ -104,19 +94,23 @@ namespace ICL.GH
 
         Conclusion:
 
-            DA.SetDataList("Display Geometries", beamSolver.GetDisplayGeometries());
-            DA.SetDataList("All Agent Systems", beamSolver.AgentSystems);
-            DA.SetData("Iteration Count", beamSolver.IterationCount);
+            DA.SetDataList("Display Geometries", slabSolver.GetDisplayGeometries());
+            DA.SetDataList("All Agent Systems", slabSolver.AgentSystems);
+            DA.SetData("Iteration Count", slabSolver.IterationCount);
         }
 
-        //protected override System.Drawing.Bitmap Icon { get { return Resources.Solver_StepByStep; } }
-        //public override GH_Exposure Exposure { get { return GH_Exposure.quinary; } }
         /// <summary>
-        /// The Exposure property controls where in the panel a component icon 
-        /// will appear. There are seven possible locations (primary to septenary), 
-        /// each of which can be combined with the GH_Exposure.obscure flag, which 
-        /// ensures the component will only be visible on panel dropdowns.
+        /// Provides an Icon for the component.
         /// </summary>
+        protected override System.Drawing.Bitmap Icon
+        {
+            get
+            {
+                //You can add image files to your project resources and access them like this:
+                // return Resources.IconForThisComponent;
+                return null;
+            }
+        }
         public override GH_Exposure Exposure => GH_Exposure.secondary;
 
         /// <summary>
@@ -125,13 +119,14 @@ namespace ICL.GH
         /// You can add image files to your project resources and access them like this:
         /// return Resources.IconForThisComponent;
         /// </summary>
-        protected override System.Drawing.Bitmap Icon => null;
 
-        ///// <summary>
-        ///// Each component must have a unique Guid to identify it. 
-        ///// It is vital this Guid doesn't change otherwise old ghx files 
-        ///// that use the old ID will partially fail during loading.
-        ///// </summary>
-        public override Guid ComponentGuid => new Guid("BC0BADFB-FA9B-49BF-8305-CE43743CBDD4");
+
+        /// <summary>
+        /// Gets the unique ID for this component. Do not change this ID after release.
+        /// </summary>
+        public override Guid ComponentGuid
+        {
+            get { return new Guid("034C310B-B3BE-4198-9CB3-6457450A67DA"); }
+        }
     }
 }

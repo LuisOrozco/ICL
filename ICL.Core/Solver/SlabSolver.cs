@@ -10,14 +10,14 @@ using ABxM.Core.AgentSystem;
 using ABxM.Core;
 using ABxM.Core.Agent;
 
-using ICL.Core.Environment;
-using ICL.Core.AgentBehaviors;
+using ICL.Core.Environments;
+using ICL.Core.Behavior;
 //using ABxM.Core.Solver;
 
 using ICL.Core.AgentSystem;
 
 
-namespace ICL.Core.ICLsolver
+namespace ICL.Core
 {
     public class SlabSolver : Solver
     {

@@ -11,11 +11,11 @@ using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
 
 using ICL.Core.Utilities;
-using ICL.Core.Environment;
-using ICL.Core.StructuralModelling;
-using ICL.Core.AgentBehaviors;
+using ICL.Core.Environments;
+using ICL.Core.Behavior;
 using ICL.Core.AgentSystem;
-using ICL.Core.ICLsolver;
+using ICL.Core;
+using ICL.Core.Agent;
 
 using Karamba.Materials;
 using Karamba.Geometry;

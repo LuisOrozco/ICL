@@ -77,6 +77,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Behavior\AddAgentBehavior.cs" />
+    <Compile Include="Behavior\RemoveAgentBehavior.cs" />
     <Compile Include="Behavior\SlabMaxDisplacementBehavior.cs" />
     <Compile Include="AgentSystem\ICLBeamAgentSystem.cs" />
     <Compile Include="AgentSystem\ICLSlabAgentSystem.cs" />

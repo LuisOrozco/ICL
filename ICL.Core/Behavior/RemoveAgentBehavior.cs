@@ -1,5 +1,6 @@
 ﻿using ABxM.Core.Agent;
 using ABxM.Core.Behavior;
+using ICL.Core.AgentSystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,16 +15,27 @@ namespace ICL.Core.Behavior
         /// The field that defines the distance within which agents are removed.
         /// </summary>
         public double Distance;
-        
+
+        /// <summary>
+        /// The probability that a new agent will be created.
+        /// </summary>
+        public double Probability;
+
+        /// <summary>
+        /// Random item that allows for agents to be created gradually.
+        /// </summary>
+        private static Random random = new Random();
+
         /// <summary>
         /// Consructs a new instance of the remove agent behavior.
         /// </summary>
         /// <param name="weight">The behavior's weight.</param>
         /// <param name="distance">The distance within which agents are removed.</param>
-        public RemoveAgentBehavior(double weight, double distance)
+        public RemoveAgentBehavior(double weight, double distance, double probability)
         {
             Weight = weight;
             Distance = distance;
+            Probability = probability;
         }
 
         /// <summary>
@@ -32,7 +44,25 @@ namespace ICL.Core.Behavior
         /// <param name="agent">The agent that executes the behavior.</param>
         public override void Execute(AgentBase agent)
         {
-            throw new NotImplementedException();
+            CartesianAgent cartesianAgent = agent as CartesianAgent;
+            ICLSlabAgentSystem agentSystem = (ICLSlabAgentSystem)(cartesianAgent.AgentSystem);
+
+            // find topological neighbour agents
+            List<CartesianAgent> neighbourList = agentSystem.FindTopologicalNeighbors(cartesianAgent);
+
+            foreach (CartesianAgent neighbour in neighbourList)
+            {
+                // Randomly decide (with given probability) whether to create a new agent
+                // This effectively makes the new agents being created gradually rather than all at once at the very first iteration
+                if (random.NextDouble() > Probability) return;
+
+                if (cartesianAgent.Position.DistanceTo(neighbour.Position) < Distance)
+                {
+                    agentSystem.Agents.Remove(cartesianAgent);
+                    return;
+                }
+            }
+
         }
     }
 }

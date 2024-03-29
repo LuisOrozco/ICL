@@ -36,11 +36,6 @@ namespace ICL.Core.Behavior
         public double Probability;
 
         /// <summary>
-        /// The minimum angle, in degrees, between the edges of each face in the mesh.
-        /// </summary>
-        public double AngleThreshold;
-
-        /// <summary>
         /// Random item that allows for agents to be created gradually.
         /// </summary>
         private static Random random = new Random();
@@ -50,12 +45,12 @@ namespace ICL.Core.Behavior
         /// </summary>
         /// <param name="weight">The behavior's weight.</param>
         /// <param name="displacement">The maximum allowable displacement.</param>
-        public AddAgentBehavior(double weight, double displacement, double probability, double angle)
+        /// <param name="probability">The probability that a new agent will be created</param>
+        public AddAgentBehavior(double weight, double displacement, double probability)
         {
             Weight = weight;
             Displacement = displacement;
             Probability = probability;
-            AngleThreshold = angle;
         }
 
         /// <summary>

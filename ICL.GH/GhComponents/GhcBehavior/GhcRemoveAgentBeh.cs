@@ -15,15 +15,15 @@ using ICL.Core.Behavior;
 
 namespace ICL.GH.GhComponents
 {
-    public class GhcAddAgentBeh : GH_Component
+    public class GhcRemoveAgentBeh : GH_Component
     {
-        AddAgentBehavior behavior = null;
+        RemoveAgentBehavior behavior = null;
 
-        public GhcAddAgentBeh()
+        public GhcRemoveAgentBeh()
           : base(
-              "Define Add Column Agent Behavior", 
-              "ICL Add Column Agent",
-              "Define the system's add column behavior",
+              "Define Remove Column Agent Behavior", 
+              "ICL Remove Column Agent",
+              "Define the system's remove column behavior",
               "ABxM",
               "ICL")
         {
@@ -37,21 +37,20 @@ namespace ICL.GH.GhComponents
             }
         }
         public override GH_Exposure Exposure => GH_Exposure.tertiary;
-        public override Guid ComponentGuid => new Guid("{38CAD9B1-AFD9-46B0-B145-420F2C067ED3}");
+        public override Guid ComponentGuid => new Guid("{3D81704C-EEC6-4F2C-9F70-BD58DD643089}");
 
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddNumberParameter("Weight", "W", "Weight", GH_ParamAccess.item, 1.0);
-            pManager.AddNumberParameter("Displ", "D", "Maximum Displacement", GH_ParamAccess.item, 0.02);
+            pManager.AddNumberParameter("Dist", "D", "Minimum Distance", GH_ParamAccess.item, 2.0);
             pManager.AddNumberParameter("Probability", "P", "Probability of creating a new agent", GH_ParamAccess.item, 0.001);
-
         }
 
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("Add Agent Behavior", "B", "Add Agent Behavior", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Remove Agent Behavior", "B", "Remove Agent Behavior", GH_ParamAccess.item);
         }
 
 
@@ -60,22 +59,22 @@ namespace ICL.GH.GhComponents
             double iWeight = double.NaN;
             DA.GetData(0, ref iWeight);
 
-            double iDisplacement = double.NaN;
-            DA.GetData(1, ref iDisplacement);
+            double iDistance = double.NaN;
+            DA.GetData(1, ref iDistance);
 
             double iProbability = double.NaN;
             DA.GetData(2, ref iProbability);
 
             if (behavior == null)
-                behavior = new AddAgentBehavior(iWeight, iDisplacement, iProbability);
+                behavior = new RemoveAgentBehavior(iWeight, iDistance, iProbability);
             else
             {
                 behavior.Weight = iWeight;
-                behavior.Displacement = iDisplacement;
+                behavior.Distance = iDistance;
                 behavior.Probability = iProbability;
             }
 
-            DA.SetData("Add Agent Behavior", behavior);
+            DA.SetData("Remove Agent Behavior", behavior);
         }
     }
 }

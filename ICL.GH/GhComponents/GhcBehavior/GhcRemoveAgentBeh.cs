@@ -22,7 +22,7 @@ namespace ICL.GH.GhComponents
         public GhcRemoveAgentBeh()
           : base(
               "Define Remove Column Agent Behavior", 
-              "ICL Remove Column Agent",
+              "Remove Column Beh.",
               "Define the system's remove column behavior",
               "ABxM",
               "ICL")

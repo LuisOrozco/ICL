@@ -22,7 +22,7 @@ namespace ICL.GH.GhComponents
         public GhcMaxDisplBeh()
           : base(
               "Define Column Maximum Displacement Behavior", 
-              "ICL Max Displ",
+              "Max Displ. Beh.",
               "Define a column's maximum displacement behavior",
               "ABxM",
               "ICL")

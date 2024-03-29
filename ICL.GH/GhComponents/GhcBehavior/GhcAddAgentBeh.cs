@@ -44,7 +44,8 @@ namespace ICL.GH.GhComponents
         {
             pManager.AddNumberParameter("Weight", "W", "Weight", GH_ParamAccess.item, 1.0);
             pManager.AddNumberParameter("Displ", "D", "Maximum Displacement", GH_ParamAccess.item, 0.02);
-            pManager.AddNumberParameter("Probability", "P", "Probability of creating a new agent", GH_ParamAccess.item, 0.001);
+            pManager.AddNumberParameter("Probability", "P", "Probability of creating a new agent", GH_ParamAccess.item, 0.01);
+            pManager.AddBooleanParameter("Reset", "R", "Reset agent count", GH_ParamAccess.item, false);
 
         }
 
@@ -65,6 +66,9 @@ namespace ICL.GH.GhComponents
 
             double iProbability = double.NaN;
             DA.GetData(2, ref iProbability);
+
+            bool iReset = false;
+            DA.GetData(3, ref iReset);
 
             if (behavior == null)
                 behavior = new AddAgentBehavior(iWeight, iDisplacement, iProbability);

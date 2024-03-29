@@ -79,7 +79,7 @@ namespace ICL.GH.GhComponents
             {
                 positions.Add(agent.Position);
             }
-            DA.SetData(1, positions);
+            DA.SetDataList(1, positions);
 
             // Verify No Go Zones
             List<Point3d> noPoints = new List<Point3d>();
@@ -100,8 +100,8 @@ namespace ICL.GH.GhComponents
             {
                 noPoints.Add(mesh.Vertices[i]);
             }
-            DA.SetData(2, exclusionCurves); 
-            DA.SetData(3, noPoints);
+            DA.SetDataList(2, exclusionCurves); 
+            DA.SetDataList(3, noPoints);
 
         }
 

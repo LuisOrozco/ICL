@@ -58,7 +58,7 @@ namespace ICL.Core.Behavior
 
                 if (cartesianAgent.Position.DistanceTo(neighbour.Position) < Distance)
                 {
-                    agentSystem.Agents.Remove(cartesianAgent);
+                    agentSystem.RemoveAgent(cartesianAgent);
                     return;
                 }
             }

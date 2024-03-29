@@ -112,8 +112,19 @@ namespace ICL.Core.Behavior
                 {
                     newAgentPosition = lineCurve.PointAtNormalizedLength(0.5);
                 }
+                double minDist = double.MaxValue;
+                Point3d newMeshAgentPosition = new Point3d();
+                foreach (int vertexId in nearVertexIds)
+                {
+                    double verDist = newAgentPosition.DistanceToSquared(mesh.Vertices[vertexId]);
+                    if (verDist < minDist)
+                    {
+                        minDist = verDist;
+                        newMeshAgentPosition = mesh.Vertices[vertexId];
+                    }
+                }
                 List<BehaviorBase> newAgentBehaviors = cartesianAgent.Behaviors; // the new agent has the same behaviors as other original agent
-                CartesianAgent newAgent = new CartesianAgent(newAgentPosition, newAgentBehaviors);
+                CartesianAgent newAgent = new CartesianAgent(newMeshAgentPosition, newAgentBehaviors);
                 agentSystem.AddAgent(newAgent);
 
             }

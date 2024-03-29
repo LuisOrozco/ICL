@@ -23,7 +23,7 @@ namespace ICL.GH.GhComponents
           : base(
               "Define Column Maximum Displacement Behavior", 
               "ICL Max Displ",
-              "Define a column's maximum displacement behaviour",
+              "Define a column's maximum displacement behavior",
               "ABxM",
               "ICL")
         {

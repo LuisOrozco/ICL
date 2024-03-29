@@ -23,7 +23,7 @@ namespace ICL.GH.GhComponents
           : base(
               "Define Add Column Agent Behavior", 
               "ICL Add Column Agent",
-              "Define the system's add column behaviour",
+              "Define the system's add column behavior",
               "ABxM",
               "ICL")
         {

@@ -46,9 +46,9 @@ namespace ICL.Core.Behavior
         private static Random random = new Random();
         
         /// <summary>
-        /// Consructs a new instance of the remove agent behaviour.
+        /// Consructs a new instance of the remove agent behavior.
         /// </summary>
-        /// <param name="weight">The behaviour's weight.</param>
+        /// <param name="weight">The behavior's weight.</param>
         /// <param name="displacement">The maximum allowable displacement.</param>
         public AddAgentBehavior(double weight, double displacement, double probability, double angle)
         {
@@ -59,91 +59,68 @@ namespace ICL.Core.Behavior
         }
 
         /// <summary>
-        /// Method for executing the behaviour's rule.
+        /// Method for executing the behavior's rule.
         /// </summary>
-        /// <param name="agent">The agent that executes the behaviour.</param>
+        /// <param name="agent">The agent that executes the behavior.</param>
         public override void Execute(AgentBase agent)
         {
             CartesianAgent cartesianAgent = agent as CartesianAgent;
             ICLSlabAgentSystem agentSystem = (ICLSlabAgentSystem)(cartesianAgent.AgentSystem);
             CartesianEnvironment cartesianEnvironment = (CartesianEnvironment)agentSystem.CartesianEnvironment;
+            Dictionary<int, double> displacements = cartesianEnvironment.CustomData.ToDictionary(kvp => int.Parse(kvp.Key), kvp => (double)kvp.Value); 
 
-            // Randomly decide (with given probability) whether to create a new agent
-            // This effectively makes the new agents being created gradually rather than all at once at the very first iteration
-            if (random.NextDouble() > Probability)  return;
-
-
-
-            // get the postition of all agents in the system
-            List<Point3d> agentPositions = agentSystem.Agents.Cast<CartesianAgent>().Select(oneAgent => oneAgent.Position).ToList();
-
-            // convert Point3d to node2 because grasshopper needs a Node2List for Delaunay
-            var nodes = new Grasshopper.Kernel.Geometry.Node2List();
-            foreach (var p in agentPositions)
-            {
-                nodes.Append(new Grasshopper.Kernel.Geometry.Node2(p.X, p.Y));
-            }
-            // Solve Delaunay
-            Connectivity diagram = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Connectivity(nodes, 1.0, false);
-            List<CartesianAgent> neighbourList = new List<CartesianAgent>();
-            List<int> connections = new List<int>();
-
-            Mesh delMesh = new Mesh();
-            var faces = new List<Grasshopper.Kernel.Geometry.Delaunay.Face>();
-            faces = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Faces(nodes, 1.0);
-            delMesh = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Mesh(nodes, 1.0, ref  faces);
-            Mesh cleanMesh = CleanMesh(delMesh, AngleThreshold);
-
-            //find this agetn's index in the clean mesh
-            Point3f agentPositionF = new Point3f((float)cartesianAgent.Position.X, (float)cartesianAgent.Position.Y, (float)cartesianAgent.Position.Z);
-            float tolerance = 0.01f;
-            int agentPositionIndex = -1;
-            for (int i = 0; i < cleanMesh.TopologyVertices.Count; i++)
-            {
-                Point3f vertex = cleanMesh.TopologyVertices[i];
-                if (vertex.DistanceTo(agentPositionF) < tolerance)
-                {
-                    agentPositionIndex = i;
-                    break;
-                }
-            }
-            if (agentPositionIndex == -1) return;
-
-            // find mesh neighbors in topology
-            int[] meshNeighborIndexes = cleanMesh.TopologyVertices.ConnectedTopologyVertices(agentPositionIndex);
+            // find topological neighbour agents
+            List<CartesianAgent> neighbourList = agentSystem.FindTopologicalNeighbors(cartesianAgent);
 
             // which neighbours have more than an allowable displacement betwen us
-            foreach (int i in meshNeighborIndexes)
+            Mesh mesh = ((Mesh3)((BuilderShell)agentSystem.ModelElements[0]).mesh).Convert();
+
+            foreach (CartesianAgent neighbour in neighbourList)
             {
-                LineCurve lineCurve = new LineCurve(cartesianAgent.Position, new Point3d(cleanMesh.TopologyVertices[i]));
+                // Randomly decide (with given probability) whether to create a new agent
+                // This effectively makes the new agents being created gradually rather than all at once at the very first iteration
+                if (random.NextDouble() > Probability) return;
+
+                LineCurve lineCurve = new LineCurve(cartesianAgent.Position, neighbour.Position);
                 int[] faceIds = new int[0];
-                Point3d[] intersections = Rhino.Geometry.Intersect.Intersection.MeshLine(cleanMesh, lineCurve.Line, out faceIds);
-                List<int> intersectingEdgesIndices = new List<int>();
+                Point3d[] intersections = Rhino.Geometry.Intersect.Intersection.MeshLine(mesh, lineCurve.Line, out faceIds);
+                List<int> nearVertexIds = new List<int>();
                 if (intersections.Length > 0)
                 {
                     foreach (int faceId in faceIds.Distinct())
                     {
-                        MeshFace face = cleanMesh.Faces[faceId];
+                        MeshFace face = mesh.Faces[faceId];
                         int[] faceVertices = face.IsQuad ? new[] { face.A, face.B, face.C, face.D } : new[] { face.A, face.B, face.C };
 
                         // Check each edge of the face for an intersection
                         for (int j = 0; j < faceVertices.Length; j++)
                         {
                             int next = (j + 1) % faceVertices.Length;
-                            Line edgeLine = cleanMesh.TopologyEdges.EdgeLine(cleanMesh.TopologyEdges.GetEdgeIndex(faceVertices[j], faceVertices[next]));
+                            Line edgeLine = mesh.TopologyEdges.EdgeLine(mesh.TopologyEdges.GetEdgeIndex(faceVertices[j], faceVertices[next]));
 
                             foreach (Point3d intersectionPoint in intersections)
                             {
                                 if (edgeLine.ClosestPoint(intersectionPoint, true).DistanceTo(intersectionPoint) < Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance)
                                 {
                                     // If the intersection point is on the edge, add the vertex indices
-                                    intersectingEdgesIndices.Add(faceVertices[j]);
-                                    intersectingEdgesIndices.Add(faceVertices[next]);
+                                    nearVertexIds.Add(faceVertices[j]);
+                                    nearVertexIds.Add(faceVertices[next]);
                                 }
                             }
                         }
                     }
                 }
+                nearVertexIds = nearVertexIds.Distinct().ToList();
+                bool exceedsMaxDisplacement = nearVertexIds.Any(vertexId => displacements[vertexId] > Displacement);
+                Point3d newAgentPosition = Point3d.Unset;
+                if (exceedsMaxDisplacement)
+                {
+                    newAgentPosition = lineCurve.PointAtNormalizedLength(0.5);
+                }
+                List<BehaviorBase> newAgentBehaviors = cartesianAgent.Behaviors; // the new agent has the same behaviors as other original agent
+                CartesianAgent newAgent = new CartesianAgent(newAgentPosition, newAgentBehaviors);
+                agentSystem.AddAgent(newAgent);
+
             }
 
         }

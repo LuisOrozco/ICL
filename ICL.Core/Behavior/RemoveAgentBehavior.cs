@@ -16,9 +16,9 @@ namespace ICL.Core.Behavior
         public double Distance;
         
         /// <summary>
-        /// Consructs a new instance of the remove agent behaviour.
+        /// Consructs a new instance of the remove agent behavior.
         /// </summary>
-        /// <param name="weight">The behaviour's weight.</param>
+        /// <param name="weight">The behavior's weight.</param>
         /// <param name="distance">The distance within which agents are removed.</param>
         public RemoveAgentBehavior(double weight, double distance)
         {
@@ -27,9 +27,9 @@ namespace ICL.Core.Behavior
         }
 
         /// <summary>
-        /// Method for executing the behaviour's rule.
+        /// Method for executing the behavior's rule.
         /// </summary>
-        /// <param name="agent">The agent that executes the behaviour.</param>
+        /// <param name="agent">The agent that executes the behavior.</param>
         public override void Execute(AgentBase agent)
         {
             throw new NotImplementedException();

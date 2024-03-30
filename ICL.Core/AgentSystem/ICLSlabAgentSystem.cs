@@ -93,7 +93,7 @@ namespace ICL.Core.AgentSystem
             {
                 CartesianEnvironment.CustomData = new Dictionary<string, object>();
             }
-
+            if(DelaunayMesh == null) { DelaunayMesh = new Mesh();}
             // Check if CustomData is empty and displDict is not null or empty
             if (CartesianEnvironment.CustomData.Count == 0)
             {
@@ -103,9 +103,12 @@ namespace ICL.Core.AgentSystem
                     CartesianEnvironment.CustomData = displDict;
                 }
             }
+            if(DelaunayMesh.Vertices.Count == 0)
+            {
+                DelaunayMesh = this.ComputeDelaunayMesh();
+
+            }
             base.PreExecute();
-            // make Delaunay Graph
-            DelaunayMesh = this.ComputeDelaunayMesh();
         }
 
         public override void PostExecute()
@@ -114,6 +117,9 @@ namespace ICL.Core.AgentSystem
             Dictionary<string, object> displDict = this.RunKaramba();
             CartesianEnvironment.CustomData.Clear();
             CartesianEnvironment.CustomData = displDict;
+            // make Delaunay Graph
+            DelaunayMesh = this.ComputeDelaunayMesh();
+
         }
 
         public Mesh ComputeDelaunayMesh()

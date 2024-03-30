@@ -74,12 +74,12 @@ namespace ICL.Core.Behavior
             {
                 // Randomly decide (with given probability) whether to create a new agent
                 // This effectively makes the new agents being created gradually rather than all at once at the very first iteration
-                if (random.NextDouble() > Probability) return;
+                //if (random.NextDouble() > Probability) return;
 
                 LineCurve lineCurve = new LineCurve(cartesianAgent.Position, neighbour.Position);
                 int[] faceIds = new int[0];
                 Point3d[] intersections = Rhino.Geometry.Intersect.Intersection.MeshLine(mesh, lineCurve.Line, out faceIds);
-                List<int> nearVertexIds = new List<int>();
+                HashSet<int> nearVertexIds = new HashSet<int>();
                 if (intersections.Length > 0)
                 {
                     foreach (int faceId in faceIds.Distinct())
@@ -105,27 +105,24 @@ namespace ICL.Core.Behavior
                         }
                     }
                 }
-                nearVertexIds = nearVertexIds.Distinct().ToList();
-                bool exceedsMaxDisplacement = nearVertexIds.Any(vertexId => displacements[vertexId] > Displacement);
-                Point3d newAgentPosition = Point3d.Unset;
-                if (exceedsMaxDisplacement)
+                if (nearVertexIds.Any(vertexId => displacements[vertexId] > Displacement))
                 {
-                    newAgentPosition = lineCurve.PointAtNormalizedLength(0.5);
-                }
-                double minDist = double.MaxValue;
-                Point3d newMeshAgentPosition = new Point3d();
-                foreach (int vertexId in nearVertexIds)
-                {
-                    double verDist = newAgentPosition.DistanceToSquared(mesh.Vertices[vertexId]);
-                    if (verDist < minDist)
+                    Point3d newAgentPosition = lineCurve.PointAtNormalizedLength(0.5);
+                    double minDist = double.MaxValue;
+                    Point3d newMeshAgentPosition = Point3d.Unset;
+                    foreach (int vertexId in nearVertexIds)
                     {
-                        minDist = verDist;
-                        newMeshAgentPosition = mesh.Vertices[vertexId];
+                        double verDist = newAgentPosition.DistanceToSquared(mesh.Vertices[vertexId]);
+                        if (verDist < minDist)
+                        {
+                            minDist = verDist;
+                            newMeshAgentPosition = mesh.Vertices[vertexId];
+                        }
                     }
+                    List<BehaviorBase> newAgentBehaviors = cartesianAgent.Behaviors; // the new agent has the same behaviors as other original agent
+                    CartesianAgent newAgent = new CartesianAgent(newMeshAgentPosition, newAgentBehaviors);
+                    agentSystem.AddAgent(newAgent);
                 }
-                List<BehaviorBase> newAgentBehaviors = cartesianAgent.Behaviors; // the new agent has the same behaviors as other original agent
-                CartesianAgent newAgent = new CartesianAgent(newMeshAgentPosition, newAgentBehaviors);
-                agentSystem.AddAgent(newAgent);
 
             }
 

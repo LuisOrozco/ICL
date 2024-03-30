@@ -56,6 +56,7 @@ namespace ICL.GH.GhComponents
             pManager.AddCurveParameter("Exclusion Curves", "C", "Curves defining no-go-zones", GH_ParamAccess.list);
             pManager.AddPointParameter("Excluded Vertices", "X", "Vertices where columns cannot go", GH_ParamAccess.list);
             pManager.AddMeshParameter("Delaunay Mesh", "M", "Delaunay mesh of agents", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Maximum Displacement", "D", "The largest displacement in the slab", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -72,7 +73,6 @@ namespace ICL.GH.GhComponents
             // Output Karamba Model for Viz
             Model karambaModel = agentSystem.KarambaModel;
             //var ghKarambaModel = new Karamba.GHopper.Models.GH_Model(karambaModel);
-
             DA.SetData(0, karambaModel);
 
             // Output Agent Positions
@@ -105,8 +105,13 @@ namespace ICL.GH.GhComponents
             DA.SetDataList(2, exclusionCurves); 
             DA.SetDataList(3, noPoints);
 
+            // Show agent connectivity
             Mesh delMesh = agentSystem.DelaunayMesh;
             DA.SetData(4, delMesh);
+
+            // find maximum displacement
+            double largestValue = agentSystem.CartesianEnvironment.CustomData.Values.Cast<double>().Max();
+            DA.SetData(5, largestValue);
         }
 
         /// <summary>

@@ -29,6 +29,7 @@ namespace ICL.GH.GhComponents
         /// <summary>
         /// Initializes a new instance of the MyComponent1 class.
         /// </summary>
+        List<ICLSlabAgentSystem> agentSystems = new List<ICLSlabAgentSystem>();
         ICLSlabAgentSystem agentSystem = null;
         List<CartesianAgent> agents = new List<CartesianAgent>();
         List<Curve> exclusionCurves = new List<Curve>();
@@ -54,6 +55,7 @@ namespace ICL.GH.GhComponents
             pManager.AddPointParameter("Agent Positions", "A", "Cartesian Agent Positions", GH_ParamAccess.list);
             pManager.AddCurveParameter("Exclusion Curves", "C", "Curves defining no-go-zones", GH_ParamAccess.list);
             pManager.AddPointParameter("Excluded Vertices", "X", "Vertices where columns cannot go", GH_ParamAccess.list);
+            pManager.AddMeshParameter("Delaunay Mesh", "M", "Delaunay mesh of agents", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -65,13 +67,13 @@ namespace ICL.GH.GhComponents
             // Pull from inputs into internal variables
             ICLSlabAgentSystem iAgentSystem = null;
             DA.GetData(0, ref iAgentSystem);
-            agentSystem = iAgentSystem;
+            agentSystem = iAgentSystem as ICLSlabAgentSystem;
 
             // Output Karamba Model for Viz
             Model karambaModel = agentSystem.KarambaModel;
-            var ghKarambaModel = new Karamba.GHopper.Models.GH_Model(karambaModel);
+            //var ghKarambaModel = new Karamba.GHopper.Models.GH_Model(karambaModel);
 
-            DA.SetData(0, ghKarambaModel);
+            DA.SetData(0, karambaModel);
 
             // Output Agent Positions
             List<Point3d> positions = new List<Point3d>();
@@ -103,6 +105,8 @@ namespace ICL.GH.GhComponents
             DA.SetDataList(2, exclusionCurves); 
             DA.SetDataList(3, noPoints);
 
+            Mesh delMesh = agentSystem.DelaunayMesh;
+            DA.SetData(4, delMesh);
         }
 
         /// <summary>

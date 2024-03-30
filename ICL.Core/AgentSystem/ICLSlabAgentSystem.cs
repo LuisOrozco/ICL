@@ -65,6 +65,7 @@ namespace ICL.Core.AgentSystem
         public List<Support> AllSupports = new List<Support>();
         public List<Load> Loads;
         public List<Curve> ExclusionCurves = new List<Curve>();
+        public Mesh DelaunayMesh;
 
         /// <inheritdoc />
         public ICLSlabAgentSystem(List<CartesianAgent> agents, CartesianEnvironment cartesianEnvironment) : base(agents, cartesianEnvironment)
@@ -82,6 +83,7 @@ namespace ICL.Core.AgentSystem
             CartesianEnvironment.CustomData.Clear();
             Dictionary<string, object> displDict = this.RunKaramba();
             CartesianEnvironment.CustomData = displDict;
+            //DelaunayMesh = this.ComputeDelaunayMesh();
         }
 
         /// <inheritdoc />
@@ -102,6 +104,8 @@ namespace ICL.Core.AgentSystem
                 }
             }
             base.PreExecute();
+            // make Delaunay Graph
+            DelaunayMesh = this.ComputeDelaunayMesh();
         }
 
         public override void PostExecute()
@@ -110,6 +114,16 @@ namespace ICL.Core.AgentSystem
             Dictionary<string, object> displDict = this.RunKaramba();
             CartesianEnvironment.CustomData.Clear();
             CartesianEnvironment.CustomData = displDict;
+        }
+
+        public Mesh ComputeDelaunayMesh()
+        {
+            Node2List nodes = new Node2List();
+            foreach (CartesianAgent agent in this.Agents)
+                nodes.Append(new Node2(agent.Position.X, agent.Position.Y));
+            List<Face> faces = new List<Face>();
+            Mesh delMesh = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Mesh(nodes, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, ref faces);
+            return delMesh;
         }
 
         /// <summary>

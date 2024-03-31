@@ -23,7 +23,7 @@ namespace ICL.Core.Behavior
         //public variables 
         public Dictionary<int, double> NodalDisplacements = new Dictionary<int, double>();
         public Dictionary<int, List<Point3d>> StartNodalDisplacemenets = new Dictionary<int, List<Point3d>>();
-        public List<Point3d> VertexNeighbours = new List<Point3d>();
+        public List<Point3d> VertexNeighbors = new List<Point3d>();
         public Mesh SlabGeo;
 
         public SlabMaxDisplacementBehavior()

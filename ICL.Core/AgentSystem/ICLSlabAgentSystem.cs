@@ -66,6 +66,8 @@ namespace ICL.Core.AgentSystem
         public List<Load> Loads;
         public List<Curve> ExclusionCurves = new List<Curve>();
         public Mesh DelaunayMesh;
+        public List<CartesianAgent> AddAgentList = new List<CartesianAgent>();
+        public List<CartesianAgent> RemoveAgentList = new List<CartesianAgent>();
 
         /// <inheritdoc />
         public ICLSlabAgentSystem(List<CartesianAgent> agents, CartesianEnvironment cartesianEnvironment) : base(agents, cartesianEnvironment)
@@ -84,6 +86,8 @@ namespace ICL.Core.AgentSystem
             Dictionary<string, object> displDict = this.RunKaramba();
             CartesianEnvironment.CustomData = displDict;
             //DelaunayMesh = this.ComputeDelaunayMesh();
+            AddAgentList.Clear();
+            RemoveAgentList.Clear() ;
         }
 
         /// <inheritdoc />
@@ -108,6 +112,8 @@ namespace ICL.Core.AgentSystem
                 DelaunayMesh = this.ComputeDelaunayMesh();
 
             }
+            AddAgentList.Clear();
+            RemoveAgentList.Clear();
             base.PreExecute();
         }
 
@@ -119,7 +125,10 @@ namespace ICL.Core.AgentSystem
             CartesianEnvironment.CustomData = displDict;
             // make Delaunay Graph
             DelaunayMesh = this.ComputeDelaunayMesh();
-
+            AddAgentList = RemoveDuplicates(AddAgentList);
+            foreach (CartesianAgent agent in AddAgentList) { this.AddAgent(agent); }
+            RemoveAgentList = RemoveDuplicates(RemoveAgentList);
+            foreach (CartesianAgent agent in RemoveAgentList) { this.RemoveAgent(agent); }
         }
 
         public Mesh ComputeDelaunayMesh()
@@ -130,6 +139,33 @@ namespace ICL.Core.AgentSystem
             List<Face> faces = new List<Face>();
             Mesh delMesh = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Mesh(nodes, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, ref faces);
             return delMesh;
+        }
+
+        /// <summary>
+        /// remove duplicate agents from a list of agents
+        /// </summary>
+        /// <param name="oldAgentList">The list of agents inlcuding duplicates</param>
+        /// <returns></returns>
+        public List<CartesianAgent> RemoveDuplicates(List<CartesianAgent> oldAgentList)
+        {
+            List<CartesianAgent> noDuplicatesList = new List<CartesianAgent>();
+            foreach (var agent in oldAgentList)
+            {
+                bool isDuplicate = false;
+                foreach (var uniqueAgent in noDuplicatesList)
+                {
+                    if (agent.Id == uniqueAgent.Id)
+                    {
+                        isDuplicate = true;
+                        break;
+                    }
+                }
+                if (!isDuplicate)
+                {
+                    noDuplicatesList.Add(agent);
+                }
+            }
+            return noDuplicatesList;
         }
 
         /// <summary>

@@ -62,21 +62,24 @@ namespace ICL.Core.Behavior
             CartesianAgent cartesianAgent = agent as CartesianAgent;
             ICLSlabAgentSystem agentSystem = (ICLSlabAgentSystem)(cartesianAgent.AgentSystem);
             CartesianEnvironment cartesianEnvironment = (CartesianEnvironment)agentSystem.CartesianEnvironment;
-            Dictionary<int, double> displacements = cartesianEnvironment.CustomData.ToDictionary(kvp => int.Parse(kvp.Key), kvp => (double)kvp.Value); 
+            Dictionary<int, double> displacements = cartesianEnvironment.CustomData.ToDictionary(kvp => int.Parse(kvp.Key), kvp => (double)kvp.Value);
+            double c = Math.Pow(10, 7);
 
-            // find topological neighbour agents
-            List<CartesianAgent> neighbourList = agentSystem.FindTopologicalNeighbors(cartesianAgent);
+            // find topological neighbor agents
+            List<CartesianAgent> neighborList = agentSystem.FindTopologicalNeighbors(cartesianAgent);
+            // find topological neighbors
+            int[] neighborIndices = agentSystem.DelaunayMesh.TopologyVertices.ConnectedTopologyVertices(agent.Id);
 
-            // which neighbours have more than an allowable displacement betwen us
+            // which neighbors have more than an allowable displacement betwen us
             Mesh mesh = ((Mesh3)((BuilderShell)agentSystem.ModelElements[0]).mesh).Convert();
 
-            foreach (CartesianAgent neighbour in neighbourList)
+            foreach (int neighbor in neighborIndices)
             {
                 // Randomly decide (with given probability) whether to create a new agent
                 // This effectively makes the new agents being created gradually rather than all at once at the very first iteration
                 //if (random.NextDouble() > Probability) return;
 
-                LineCurve lineCurve = new LineCurve(cartesianAgent.Position, neighbour.Position);
+                LineCurve lineCurve = new LineCurve(cartesianAgent.Position, agentSystem.DelaunayMesh.Vertices[neighbor]);
                 int[] faceIds = new int[0];
                 Point3d[] intersections = Rhino.Geometry.Intersect.Intersection.MeshLine(mesh, lineCurve.Line, out faceIds);
                 HashSet<int> nearVertexIds = new HashSet<int>();
@@ -105,7 +108,7 @@ namespace ICL.Core.Behavior
                         }
                     }
                 }
-                if (nearVertexIds.Any(vertexId => displacements[vertexId] > Displacement))
+                if (nearVertexIds.Any(vertexId => displacements[vertexId] *c > Displacement))
                 {
                     Point3d newAgentPosition = lineCurve.PointAtNormalizedLength(0.5);
                     double minDist = double.MaxValue;
@@ -121,7 +124,7 @@ namespace ICL.Core.Behavior
                     }
                     List<BehaviorBase> newAgentBehaviors = cartesianAgent.Behaviors; // the new agent has the same behaviors as other original agent
                     CartesianAgent newAgent = new CartesianAgent(newMeshAgentPosition, newAgentBehaviors);
-                    agentSystem.AddAgent(newAgent);
+                    agentSystem.AddAgentList.Add(newAgent);
                 }
 
             }

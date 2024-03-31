@@ -60,13 +60,13 @@ namespace ICL.Core.Behavior
         public override void Execute(AgentBase agent)
         {
             CartesianAgent cartesianAgent = (CartesianAgent)agent;
-            ICLSlabAgentSystem system = (ICLSlabAgentSystem)(cartesianAgent.AgentSystem);
-            Mesh mesh = ((Mesh3)((BuilderShell)system.ModelElements[0]).mesh).Convert();
+            ICLSlabAgentSystem agentSystem = (ICLSlabAgentSystem)(cartesianAgent.AgentSystem);
+            Mesh mesh = ((Mesh3)((BuilderShell)agentSystem.ModelElements[0]).mesh).Convert();
 
 
             // Randomly decide (with probability 0.001) whether to create a new agent and request to add it to the system
             // This effectively makes the new agents being created gradually rather than all at once at the very first iteration
-            if (random.NextDouble() > Probability || system.Agents.Count > 149) return;
+            if (random.NextDouble() > Probability || agentSystem.Agents.Count > 149) return;
 
             Point3d newAgentPosition = cartesianAgent.Position + new Vector3d(0.1, 0, 0); // new agent is located right next to the original agent
 
@@ -86,7 +86,7 @@ namespace ICL.Core.Behavior
             List<BehaviorBase> newAgentBehaviors = cartesianAgent.Behaviors; // the new agent has the same behaviors as other original agent
             CartesianAgent newAgent = new CartesianAgent(newMeshAgentPosition, newAgentBehaviors);
 
-            system.AddAgent(newAgent);
+            agentSystem.AddAgent(newAgent);
         }
 
     }

@@ -125,10 +125,10 @@ namespace ICL.Core.AgentSystem
             CartesianEnvironment.CustomData = displDict;
             // make Delaunay Graph
             DelaunayMesh = this.ComputeDelaunayMesh();
-            AddAgentList = RemoveDuplicates(AddAgentList);
-            foreach (CartesianAgent agent in AddAgentList) { this.AddAgent(agent); }
-            RemoveAgentList = RemoveDuplicates(RemoveAgentList);
-            foreach (CartesianAgent agent in RemoveAgentList) { this.RemoveAgent(agent); }
+            List<CartesianAgent> cleanAddAgentList = RemoveDuplicates(AddAgentList);
+            foreach (CartesianAgent agent in cleanAddAgentList) { this.AddAgent(agent); }
+            List<CartesianAgent> cleanRemoveAgentList = RemoveDuplicates(RemoveAgentList);
+            foreach (CartesianAgent agent in cleanRemoveAgentList) { this.RemoveAgent(agent); }
         }
 
         public Mesh ComputeDelaunayMesh()
@@ -154,7 +154,7 @@ namespace ICL.Core.AgentSystem
                 bool isDuplicate = false;
                 foreach (var uniqueAgent in noDuplicatesList)
                 {
-                    if (agent.Id == uniqueAgent.Id)
+                    if (agent.Position == uniqueAgent.Position)
                     {
                         isDuplicate = true;
                         break;

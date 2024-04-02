@@ -47,6 +47,7 @@ using Karamba;
 using Karamba.CrossSections;
 using Karamba.Elements;
 using Karamba.Geometry;
+using Karamba.GHopper.Geometry;
 using Karamba.Loads;
 using Karamba.Materials;
 using Karamba.Models;
@@ -54,6 +55,7 @@ using Karamba.Supports;
 using Karamba.Utilities;
 using KarambaCommon;
 using Karamba.Results;
+using Plane = Rhino.Geometry.Plane;
 
 namespace ICL.Core.AgentSystem
 {
@@ -65,9 +67,11 @@ namespace ICL.Core.AgentSystem
         public List<Support> AllSupports = new List<Support>();
         public List<Load> Loads;
         public List<Curve> ExclusionCurves = new List<Curve>();
+        public List<int> ExclusionIndices = new List<int>();
         public Mesh DelaunayMesh;
         public List<CartesianAgent> AddAgentList = new List<CartesianAgent>();
         public List<CartesianAgent> RemoveAgentList = new List<CartesianAgent>();
+        public double DisplacementThreshold = 0.0;
 
         /// <inheritdoc />
         public ICLSlabAgentSystem(List<CartesianAgent> agents, CartesianEnvironment cartesianEnvironment) : base(agents, cartesianEnvironment)
@@ -89,6 +93,20 @@ namespace ICL.Core.AgentSystem
             DelaunayMesh = this.ComputeDelaunayMesh();
             AddAgentList.Clear();
             RemoveAgentList.Clear() ;
+
+            //// Find indexes of vertixes inside the no column zones
+
+            Mesh SlabGeo = ((Mesh3)((BuilderShell)this.ModelElements[0]).mesh).Convert();
+            for (int i = 0; i < SlabGeo.Vertices.Count; i++)
+            {
+                foreach (Curve exclCurve in ExclusionCurves)
+                {
+                    if (exclCurve.Contains(SlabGeo.Vertices[i], Plane.WorldXY, 0.01) == PointContainment.Inside)
+                    {
+                        ExclusionIndices.Add(i);
+                    }
+                }
+            }
         }
 
         /// <inheritdoc />
@@ -133,8 +151,11 @@ namespace ICL.Core.AgentSystem
         public Mesh ComputeDelaunayMesh()
         {
             Node2List nodes = new Node2List();
-            foreach (CartesianAgent agent in this.Agents)
+            for (int i = 0; i < this.Agents.Count; i++)
+            {
+                CartesianAgent agent = this.Agents[i] as CartesianAgent;
                 nodes.Append(new Node2(agent.Position.X, agent.Position.Y));
+            }
             List<Face> faces = new List<Face>();
             Mesh delMesh = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Mesh(nodes, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, ref faces);
             return delMesh;
@@ -249,6 +270,18 @@ namespace ICL.Core.AgentSystem
 
             KarambaModel = clonedModel;
             return nodalDisplacements;
+        }
+
+        public override bool IsFinished()
+        {
+            bool result = false;
+            if (DisplacementThreshold != 0)
+            {
+                double max = this.CartesianEnvironment.CustomData.Values.Cast<double>().Max() * 10000000000;
+                if (max < DisplacementThreshold)
+                    result = true;
+            }
+            return result;
         }
 
     }

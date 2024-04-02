@@ -130,19 +130,19 @@ namespace ICL.Core.Behavior
                 // do any of these vertices have a high enough displacement?
                 if (cleanVertexIds.Any(vertexId => displacements[vertexId] * c > Displacement))
                 {
-                    // Find indexes of vertices inside the no column zones
-                    List<Curve> exclusonCurves = new List<Curve>(agentSystem.ExclusionCurves);
-                    List<int> exclusionIndices = new List<int>();
-                    for (int i = 0; i < envMesh.Vertices.Count; i++)
-                    {
-                        foreach (Curve exclCurve in exclusonCurves)
-                        {
-                            if (exclCurve.Contains(envMesh.Vertices[i], Plane.WorldXY, 0.01) == PointContainment.Inside)
-                            {
-                                exclusionIndices.Add(i);
-                            }
-                        }
-                    }
+                    //// Find indexes of vertices inside the no column zones
+                    //List<Curve> exclusonCurves = new List<Curve>(agentSystem.ExclusionCurves);
+                    //List<int> exclusionIndices = new List<int>();
+                    //for (int i = 0; i < envMesh.Vertices.Count; i++)
+                    //{
+                    //    foreach (Curve exclCurve in exclusonCurves)
+                    //    {
+                    //        if (exclCurve.Contains(envMesh.Vertices[i], Plane.WorldXY, 0.01) == PointContainment.Inside)
+                    //        {
+                    //            exclusionIndices.Add(i);
+                    //        }
+                    //    }
+                    //}
                     // midpoint on agent delaunay
                     Point3d newAgentPosition = lineCurve.PointAtNormalizedLength(0.5);
                     double minDist = double.MaxValue;
@@ -152,7 +152,7 @@ namespace ICL.Core.Behavior
                     foreach (int vertexId in cleanVertexIds)
                     {
                         // only make agents outside of exclusion zones
-                        if (exclusionIndices.Contains(vertexId)) { continue; }
+                        if (agentSystem.ExclusionIndices.Contains(vertexId)) { continue; }
                         double verDist = newAgentPosition.DistanceToSquared(envMesh.Vertices[vertexId]);
                         if (verDist < minDist && verDist <= maxDistSquared)
                         {

@@ -56,7 +56,9 @@ namespace ICL.Core.Behavior
             int agentId = -1;
             for (int i = 0; i < agentDelaunay.Vertices.Count; i++)
             {
-                if (agentDelaunay.Vertices[i].Equals(cartesianAgent.Position))
+                Point3f pointF = agentDelaunay.Vertices[i];
+                Point3d pointD = new Point3d(pointF);
+                if (cartesianAgent.Position.DistanceTo(pointD) < 0.001)
                 {
                     agentId = i;
                     break;

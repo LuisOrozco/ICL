@@ -6,6 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Rhino.Geometry;
+using Rhino;
+
 
 namespace ICL.Core.Behavior
 {
@@ -46,19 +49,40 @@ namespace ICL.Core.Behavior
         {
             CartesianAgent cartesianAgent = agent as CartesianAgent;
             ICLSlabAgentSystem agentSystem = (ICLSlabAgentSystem)(cartesianAgent.AgentSystem);
+            double distSquared = Distance * Distance;
 
             // find topological neighbor agents
             List<CartesianAgent> neighborList = agentSystem.FindTopologicalNeighbors(cartesianAgent);
+            int[] neighborIndices = agentSystem.DelaunayMesh.TopologyVertices.ConnectedTopologyVertices(agent.Id);
 
-            foreach (CartesianAgent neighbor in neighborList)
+            foreach (int neighborIndex in neighborIndices)
             {
                 // Randomly decide (with given probability) whether to create a new agent
                 // This effectively makes the new agents being created gradually rather than all at once at the very first iteration
                 if (random.NextDouble() > Probability) return;
-
-                if (cartesianAgent.Position.DistanceTo(neighbor.Position) < Distance)
+                Point3f neighborF = agentSystem.DelaunayMesh.Vertices[neighborIndex];
+                Point3d neighborD = new Point3d(neighborF);
+                if (cartesianAgent.Position.DistanceToSquared(neighborD) < distSquared)
                 {
-                    agentSystem.RemoveAgent(cartesianAgent);
+                    CartesianAgent neighbor = null;
+                    foreach (CartesianAgent otherAgent in agentSystem.Agents)
+                    {
+                        if (otherAgent.Position == neighborD)
+                        {
+                            neighbor = otherAgent;
+                            break;
+                        }
+                    }
+                    if (neighbor == null) continue;
+
+                    if (cartesianAgent.Id < neighbor.Id)
+                    {
+                        agentSystem.RemoveAgentList.Add(cartesianAgent);
+                    }
+                    else
+                    {
+                        agentSystem.RemoveAgentList.Add(neighbor);
+                    }
                     return;
                 }
             }

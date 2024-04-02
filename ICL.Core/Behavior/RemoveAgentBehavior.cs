@@ -70,10 +70,10 @@ namespace ICL.Core.Behavior
             {
                 // Randomly decide (with given probability) whether to create a new agent
                 // This effectively makes the new agents being created gradually rather than all at once at the very first iteration
-                if (random.NextDouble() > Probability) return;
+                // if (random.NextDouble() > Probability) return;
                 Point3f neighborF = agentSystem.DelaunayMesh.Vertices[neighborIndex];
                 Point3d neighborD = new Point3d(neighborF);
-                if (cartesianAgent.Position.DistanceToSquared(neighborD) < distSquared)
+                if (cartesianAgent.Position.DistanceTo(neighborD) < Distance)
                 {
                     CartesianAgent neighbor = null;
                     foreach (CartesianAgent otherAgent in agentSystem.Agents)

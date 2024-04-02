@@ -90,7 +90,7 @@ namespace ICL.Core.Behavior
             foreach (int neighborIndex in neighborIndices)
             {
                 // Randomly decide (with given probability) whether to create a new agent, effectively creates new agents gradually rather than all at once at the very first iteration
-                if (random.NextDouble() > Probability) continue;
+                // if (random.NextDouble() > Probability) continue;
 
                 // find intersections between agent delaunay and evironment mesh edges
                 LineCurve lineCurve = new LineCurve(cartesianAgent.Position, agentDelaunay.Vertices[neighborIndex]);

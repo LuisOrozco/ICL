@@ -26,6 +26,11 @@ namespace ICL.Core.Behavior
     public class AddAgentBehavior : BehaviorBase
     {
         /// <summary>
+        /// The field that defines the minimum distance between two agents, within which agents are removed.
+        /// </summary>
+        public double Distance;
+        
+        /// <summary>
         /// The field that defines the maximum displacement between agents before another is created.
         /// </summary>
         public double Displacement;
@@ -46,11 +51,12 @@ namespace ICL.Core.Behavior
         /// <param name="weight">The behavior's weight.</param>
         /// <param name="displacement">The maximum allowable displacement.</param>
         /// <param name="probability">The probability that a new agent will be created</param>
-        public AddAgentBehavior(double weight, double displacement, double probability)
+        public AddAgentBehavior(double weight, double displacement, double probability, double distance)
         {
             Weight = weight;
             Displacement = displacement;
             Probability = probability;
+            Distance = distance;
         }
 
         /// <summary>
@@ -59,72 +65,92 @@ namespace ICL.Core.Behavior
         /// <param name="agent">The agent that executes the behavior.</param>
         public override void Execute(AgentBase agent)
         {
+            // defintions
             CartesianAgent cartesianAgent = agent as CartesianAgent;
             ICLSlabAgentSystem agentSystem = (ICLSlabAgentSystem)(cartesianAgent.AgentSystem);
+            Mesh mesh = ((Mesh3)((BuilderShell)agentSystem.ModelElements[0]).mesh).Convert();
             CartesianEnvironment cartesianEnvironment = (CartesianEnvironment)agentSystem.CartesianEnvironment;
             Dictionary<int, double> displacements = cartesianEnvironment.CustomData.ToDictionary(kvp => int.Parse(kvp.Key), kvp => (double)kvp.Value);
             double c = Math.Pow(10, 7);
 
-            // find topological neighbor agents
-            List<CartesianAgent> neighborList = agentSystem.FindTopologicalNeighbors(cartesianAgent);
             // find topological neighbors
             int[] neighborIndices = agentSystem.DelaunayMesh.TopologyVertices.ConnectedTopologyVertices(agent.Id);
-
-            // which neighbors have more than an allowable displacement betwen us
-            Mesh mesh = ((Mesh3)((BuilderShell)agentSystem.ModelElements[0]).mesh).Convert();
-
-            foreach (int neighbor in neighborIndices)
+            foreach (int neighborIndex in neighborIndices)
             {
-                // Randomly decide (with given probability) whether to create a new agent
-                // This effectively makes the new agents being created gradually rather than all at once at the very first iteration
-                //if (random.NextDouble() > Probability) return;
+                // Randomly decide (with given probability) whether to create a new agent, effectively creates new agents gradually rather than all at once at the very first iteration
+                if (random.NextDouble() > Probability) continue;
 
-                LineCurve lineCurve = new LineCurve(cartesianAgent.Position, agentSystem.DelaunayMesh.Vertices[neighbor]);
+                // find intersections between agent delaunay and evironment mesh edges
+                LineCurve lineCurve = new LineCurve(cartesianAgent.Position, agentSystem.DelaunayMesh.Vertices[neighborIndex]);
                 int[] faceIds = new int[0];
                 Point3d[] intersections = Rhino.Geometry.Intersect.Intersection.MeshLine(mesh, lineCurve.Line, out faceIds);
-                HashSet<int> nearVertexIds = new HashSet<int>();
-                if (intersections.Length > 0)
+
+                // if there are intersections,find the endpoints of the intersecting edges
+                if (!(intersections.Length > 0)) continue;
+                List<int> nearVertexIds = new List<int>();
+                foreach (int faceId in faceIds.Distinct())
                 {
-                    foreach (int faceId in faceIds.Distinct())
+                    // look at the faces it intersected with
+                    MeshFace face = mesh.Faces[faceId];
+                    int[] faceVertices = face.IsQuad ? new[] { face.A, face.B, face.C, face.D } : new[] { face.A, face.B, face.C };
+
+                    // Check each edge of the face for an intersection
+                    for (int j = 0; j < faceVertices.Length; j++)
                     {
-                        MeshFace face = mesh.Faces[faceId];
-                        int[] faceVertices = face.IsQuad ? new[] { face.A, face.B, face.C, face.D } : new[] { face.A, face.B, face.C };
+                        int next = (j + 1) % faceVertices.Length;
+                        Line edgeLine = mesh.TopologyEdges.EdgeLine(mesh.TopologyEdges.GetEdgeIndex(faceVertices[j], faceVertices[next]));
 
-                        // Check each edge of the face for an intersection
-                        for (int j = 0; j < faceVertices.Length; j++)
+                        foreach (Point3d intersectionPoint in intersections)
                         {
-                            int next = (j + 1) % faceVertices.Length;
-                            Line edgeLine = mesh.TopologyEdges.EdgeLine(mesh.TopologyEdges.GetEdgeIndex(faceVertices[j], faceVertices[next]));
-
-                            foreach (Point3d intersectionPoint in intersections)
+                            if (edgeLine.ClosestPoint(intersectionPoint, true).DistanceTo(intersectionPoint) < 0.001)
                             {
-                                if (edgeLine.ClosestPoint(intersectionPoint, true).DistanceTo(intersectionPoint) < Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance)
-                                {
-                                    // If the intersection point is on the edge, add the vertex indices
-                                    nearVertexIds.Add(faceVertices[j]);
-                                    nearVertexIds.Add(faceVertices[next]);
-                                }
+                                // If the intersection point is on the edge, add the vertex indices
+                                nearVertexIds.Add(faceVertices[j]);
+                                nearVertexIds.Add(faceVertices[next]);
                             }
                         }
                     }
                 }
-                if (nearVertexIds.Any(vertexId => displacements[vertexId] *c > Displacement))
+                // remove duplicates from list of intersecting edge endpoints
+                List<int> cleanVertexIds = nearVertexIds.Distinct().ToList();
+                // do any of these vertices have a high enough displacement?
+                if (nearVertexIds.Any(vertexId => displacements[vertexId] * c > Displacement))
                 {
+                    // midpoint on agent delaunay
                     Point3d newAgentPosition = lineCurve.PointAtNormalizedLength(0.5);
                     double minDist = double.MaxValue;
                     Point3d newMeshAgentPosition = Point3d.Unset;
+                    double maxDist = 0.8;
+                    double maxDistSquared = maxDist * maxDist;
                     foreach (int vertexId in nearVertexIds)
                     {
                         double verDist = newAgentPosition.DistanceToSquared(mesh.Vertices[vertexId]);
-                        if (verDist < minDist)
+                        if (verDist < minDist && verDist <= maxDistSquared)
                         {
+                            // environment mesh vertex closest to midpoint and within 0.8m
                             minDist = verDist;
                             newMeshAgentPosition = mesh.Vertices[vertexId];
                         }
                     }
-                    List<BehaviorBase> newAgentBehaviors = cartesianAgent.Behaviors; // the new agent has the same behaviors as other original agent
-                    CartesianAgent newAgent = new CartesianAgent(newMeshAgentPosition, newAgentBehaviors);
-                    agentSystem.AddAgentList.Add(newAgent);
+                    // make sure new agent is close enough to agent delaunay midpoint
+                    if (newMeshAgentPosition == Point3d.Unset) continue;
+                    // only make newAgent if its not too close to an existing agent
+                    bool isCloseToAnyAgent = false;
+                    foreach (CartesianAgent otherAgent in agentSystem.Agents)
+                    {
+                        if (newMeshAgentPosition.DistanceTo(cartesianAgent.Position) < Distance)
+                        {
+                            isCloseToAnyAgent = true;
+                            break;
+                        }
+                    }
+                    if (!isCloseToAnyAgent)
+                    {
+                        List<BehaviorBase> newAgentBehaviors = cartesianAgent.Behaviors;
+                        CartesianAgent newAgent = new CartesianAgent(newMeshAgentPosition, newAgentBehaviors);
+                        agentSystem.AddAgentList.Add(newAgent);
+                    }
+
                 }
 
             }

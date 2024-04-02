@@ -85,7 +85,7 @@ namespace ICL.Core.AgentSystem
             CartesianEnvironment.CustomData.Clear();
             Dictionary<string, object> displDict = this.RunKaramba();
             CartesianEnvironment.CustomData = displDict;
-            //DelaunayMesh = this.ComputeDelaunayMesh();
+            DelaunayMesh = this.ComputeDelaunayMesh();
             AddAgentList.Clear();
             RemoveAgentList.Clear() ;
         }

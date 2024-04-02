@@ -12,7 +12,7 @@ namespace ICL.Core.Behavior
     public class RemoveAgentBehavior : BehaviorBase
     {
         /// <summary>
-        /// The field that defines the distance within which agents are removed.
+        /// The field that defines the minimum distance between two agents, within which agents are removed.
         /// </summary>
         public double Distance;
 

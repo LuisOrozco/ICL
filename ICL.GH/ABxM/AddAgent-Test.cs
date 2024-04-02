@@ -78,6 +78,7 @@ public class AddAgentTest : GH_ScriptInstance
         Mesh mesh = ((Mesh3)((BuilderShell)agentSystem.ModelElements[0]).mesh).Convert();
         Mesh delMesh = agentSystem.DelaunayMesh;
         Dictionary<int, double> displacements = agentSystem.CartesianEnvironment.CustomData.ToDictionary(kvp => int.Parse(kvp.Key), kvp => (double)kvp.Value);
+        double c = Math.Pow(10, 7);
 
         // testing variables
         List<Point3d> allIntersections = new List<Point3d>();
@@ -85,6 +86,7 @@ public class AddAgentTest : GH_ScriptInstance
         DataTree<object> testTree = new DataTree<object>();
         int pathNum = 0;
         List<bool> tooMuch = new List<bool>();
+        List<Point3d> newAgents = new List<Point3d>();
 
         // find topological neighbors
         int[] neighborIndices = delMesh.TopologyVertices.ConnectedTopologyVertices(iAgentID);
@@ -121,7 +123,6 @@ public class AddAgentTest : GH_ScriptInstance
             }
             List<int> cleanVertexIds = nearVertexIds.Distinct().ToList();
             List<double> displs = new List<double>();
-            double c = Math.Pow(10, 7);
             foreach (int vertexId in cleanVertexIds)
             {
                 double displ = displacements[vertexId] * c;

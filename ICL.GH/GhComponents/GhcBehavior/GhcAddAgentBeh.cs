@@ -43,8 +43,9 @@ namespace ICL.GH.GhComponents
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddNumberParameter("Weight", "W", "Weight", GH_ParamAccess.item, 1.0);
-            pManager.AddNumberParameter("Displ", "D", "Maximum Displacement", GH_ParamAccess.item, 0.02);
+            pManager.AddNumberParameter("Displ", "Df", "Maximum Displacement", GH_ParamAccess.item, 0.02);
             pManager.AddNumberParameter("Probability", "P", "Probability of creating a new agent", GH_ParamAccess.item, 0.01);
+            pManager.AddNumberParameter("Distance", "Ds", "Minimum distance between agents", GH_ParamAccess.item, 2.0);
             pManager.AddBooleanParameter("Reset", "R", "Reset agent count", GH_ParamAccess.item, false);
 
         }
@@ -67,16 +68,20 @@ namespace ICL.GH.GhComponents
             double iProbability = double.NaN;
             DA.GetData(2, ref iProbability);
 
+            double iDistance = double.NaN;
+            DA.GetData(3, ref iDistance);
+
             bool iReset = false;
-            DA.GetData(3, ref iReset);
+            DA.GetData(4, ref iReset);
 
             if (behavior == null)
-                behavior = new AddAgentBehavior(iWeight, iDisplacement, iProbability);
+                behavior = new AddAgentBehavior(iWeight, iDisplacement, iProbability, iDistance);
             else
             {
                 behavior.Weight = iWeight;
                 behavior.Displacement = iDisplacement;
                 behavior.Probability = iProbability;
+                behavior.Distance = iDistance;
             }
 
             DA.SetData("Add Agent Behavior", behavior);

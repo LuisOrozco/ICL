@@ -9,7 +9,7 @@ using Rhino.Geometry;
 ///Copy "..\bin\yourAddon.dll" "$(AppData)\Grasshopper\Libraries\yourAddon.dll"
 
 
-namespace ICL.Core.AgentPos
+namespace ICL.Core.Agent
 {
     /// <summary>
     /// The AgentPos namespace contains fundamental types that define commonly used value types and classes for computing the column agent start pos
@@ -40,7 +40,7 @@ namespace ICL.Core.AgentPos
 
             if (this.ColumnNumbers == 0)
             {
-                RhinoApp.WriteLine("number of column Numbers must be greater than 0");
+                //("number of column Numbers must be greater than 0");
             }
 
             else if (this.ColumnNumbers == this.EnvironmentBoundary.Count)

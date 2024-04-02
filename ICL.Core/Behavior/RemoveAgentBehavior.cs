@@ -49,11 +49,22 @@ namespace ICL.Core.Behavior
         {
             CartesianAgent cartesianAgent = agent as CartesianAgent;
             ICLSlabAgentSystem agentSystem = (ICLSlabAgentSystem)(cartesianAgent.AgentSystem);
+            Mesh agentDelaunay = agentSystem.DelaunayMesh;
             double distSquared = Distance * Distance;
 
+            // find the agent delaunay vertex Id of my agent
+            int agentId = -1;
+            for (int i = 0; i < agentDelaunay.Vertices.Count; i++)
+            {
+                if (agentDelaunay.Vertices[i].Equals(cartesianAgent.Position))
+                {
+                    agentId = i;
+                    break;
+                }
+            }
+            if (agentId == -1) { return; }
             // find topological neighbor agents
-            List<CartesianAgent> neighborList = agentSystem.FindTopologicalNeighbors(cartesianAgent);
-            int[] neighborIndices = agentSystem.DelaunayMesh.TopologyVertices.ConnectedTopologyVertices(agent.Id);
+            int[] neighborIndices = agentSystem.DelaunayMesh.TopologyVertices.ConnectedTopologyVertices(agentId);
 
             foreach (int neighborIndex in neighborIndices)
             {

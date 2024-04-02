@@ -85,6 +85,7 @@ namespace ICL.Core.AgentSystem
             CartesianEnvironment.CustomData.Clear();
             Dictionary<string, object> displDict = this.RunKaramba();
             CartesianEnvironment.CustomData = displDict;
+            DelaunayMesh = null;
             DelaunayMesh = this.ComputeDelaunayMesh();
             AddAgentList.Clear();
             RemoveAgentList.Clear() ;
@@ -116,16 +117,15 @@ namespace ICL.Core.AgentSystem
             Dictionary<string, object> displDict = this.RunKaramba();
             CartesianEnvironment.CustomData.Clear();
             CartesianEnvironment.CustomData = displDict;
-            // make Delaunay Graph
-            DelaunayMesh = this.ComputeDelaunayMesh();
+
             if (AddAgentList.Count > 0)
             {
-                List<CartesianAgent> cleanAddAgentList = RemoveDuplicates(AddAgentList);
+                List<CartesianAgent> cleanAddAgentList = CleanDuplicates(AddAgentList);
                 foreach (CartesianAgent agent in cleanAddAgentList) { this.AddAgent(agent); }
             }
             if (RemoveAgentList.Count > 0)
             {
-                List<CartesianAgent> cleanRemoveAgentList = RemoveDuplicates(RemoveAgentList);
+                List<CartesianAgent> cleanRemoveAgentList = CleanDuplicates(RemoveAgentList);
                 foreach (CartesianAgent agent in cleanRemoveAgentList) { this.RemoveAgent(agent); }
             }
         }
@@ -145,7 +145,7 @@ namespace ICL.Core.AgentSystem
         /// </summary>
         /// <param name="oldAgentList">The list of agents inlcuding duplicates</param>
         /// <returns></returns>
-        public List<CartesianAgent> RemoveDuplicates(List<CartesianAgent> oldAgentList)
+        public List<CartesianAgent> CleanDuplicates(List<CartesianAgent> oldAgentList)
         {
             List<CartesianAgent> noDuplicatesList = new List<CartesianAgent>();
             foreach (var agent in oldAgentList)

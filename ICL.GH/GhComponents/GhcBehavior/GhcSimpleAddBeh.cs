@@ -17,7 +17,7 @@ namespace ICL.GH.GhComponents
 {
     public class GhcSimpleAddBeh : GH_Component
     {
-        AddAgentBehavior behavior = null;
+        SimpleAddBehavior behavior = null;
 
         public GhcSimpleAddBeh()
           : base(
@@ -71,7 +71,7 @@ namespace ICL.GH.GhComponents
             DA.GetData(3, ref iReset);
 
             if (behavior == null)
-                behavior = new AddAgentBehavior(iWeight, iDisplacement, iProbability);
+                behavior = new SimpleAddBehavior(iWeight, iDisplacement, iProbability);
             else
             {
                 behavior.Weight = iWeight;

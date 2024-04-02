@@ -93,11 +93,8 @@ namespace ICL.Core.AgentSystem
         /// <inheritdoc />
         public override void PreExecute()
         {
-            if (CartesianEnvironment.CustomData == null)
-            {
-                CartesianEnvironment.CustomData = new Dictionary<string, object>();
-            }
-            if(DelaunayMesh == null) { DelaunayMesh = new Mesh();}
+            if (CartesianEnvironment.CustomData == null) CartesianEnvironment.CustomData = new Dictionary<string, object>();
+            if (DelaunayMesh == null) DelaunayMesh = new Mesh();
             // Check if CustomData is empty and displDict is not null or empty
             if (CartesianEnvironment.CustomData.Count == 0)
             {
@@ -107,11 +104,7 @@ namespace ICL.Core.AgentSystem
                     CartesianEnvironment.CustomData = displDict;
                 }
             }
-            if(DelaunayMesh.Vertices.Count == 0)
-            {
-                DelaunayMesh = this.ComputeDelaunayMesh();
-
-            }
+            DelaunayMesh = this.ComputeDelaunayMesh();
             AddAgentList.Clear();
             RemoveAgentList.Clear();
             base.PreExecute();
@@ -125,10 +118,16 @@ namespace ICL.Core.AgentSystem
             CartesianEnvironment.CustomData = displDict;
             // make Delaunay Graph
             DelaunayMesh = this.ComputeDelaunayMesh();
-            List<CartesianAgent> cleanAddAgentList = RemoveDuplicates(AddAgentList);
-            foreach (CartesianAgent agent in cleanAddAgentList) { this.AddAgent(agent); }
-            List<CartesianAgent> cleanRemoveAgentList = RemoveDuplicates(RemoveAgentList);
-            foreach (CartesianAgent agent in cleanRemoveAgentList) { this.RemoveAgent(agent); }
+            if (AddAgentList.Count > 0)
+            {
+                List<CartesianAgent> cleanAddAgentList = RemoveDuplicates(AddAgentList);
+                foreach (CartesianAgent agent in cleanAddAgentList) { this.AddAgent(agent); }
+            }
+            if (RemoveAgentList.Count > 0)
+            {
+                List<CartesianAgent> cleanRemoveAgentList = RemoveDuplicates(RemoveAgentList);
+                foreach (CartesianAgent agent in cleanRemoveAgentList) { this.RemoveAgent(agent); }
+            }
         }
 
         public Mesh ComputeDelaunayMesh()

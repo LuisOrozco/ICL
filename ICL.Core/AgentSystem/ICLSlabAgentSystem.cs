@@ -38,9 +38,6 @@ using ICL.Core;
 using ICL.Core.Behavior;
 using ICL.Core.AgentSystem;
 using ICL.Core.Environments;
-using ICL.Core;
-using ICL.Core.Utilities;
-using ICL.Core.Utilities;
 using ICL.Core.Utilities;
 
 using Karamba;
@@ -55,7 +52,6 @@ using Karamba.Supports;
 using Karamba.Utilities;
 using KarambaCommon;
 using Karamba.Results;
-using Plane = Rhino.Geometry.Plane;
 
 namespace ICL.Core.AgentSystem
 {
@@ -101,7 +97,7 @@ namespace ICL.Core.AgentSystem
             {
                 foreach (Curve exclCurve in ExclusionCurves)
                 {
-                    if (exclCurve.Contains(SlabGeo.Vertices[i], Plane.WorldXY, 0.01) == PointContainment.Inside)
+                    if (exclCurve.Contains(SlabGeo.Vertices[i], Rhino.Geometry.Plane.WorldXY, 0.01) == PointContainment.Inside)
                     {
                         ExclusionIndices.Add(i);
                     }

@@ -18,6 +18,8 @@ using Karamba.GHopper.Geometry;
 using Karamba.GHopper.Supports;
 using Karamba.GHopper.Loads;
 using Rhino.Geometry;
+using ICL.GH.Properties;
+using System.ComponentModel;
 
 
 namespace ICL.GH.GhComponents
@@ -196,15 +198,8 @@ namespace ICL.GH.GhComponents
         /// <summary>
         /// Provides an Icon for the component.
         /// </summary>
-        protected override System.Drawing.Bitmap Icon
-        {
-            get
-            {
-                //You can add image files to your project resources and access them like this:
-                // return Resources.IconForThisComponent;
-                return null;
-            }
-        }
+        protected override System.Drawing.Bitmap Icon =>  Properties.Resources.ICLSystem_icn;
+
         public override GH_Exposure Exposure => GH_Exposure.primary;
 
         /// <summary>

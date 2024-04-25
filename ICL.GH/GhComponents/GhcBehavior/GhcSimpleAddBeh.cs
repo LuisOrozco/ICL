@@ -29,13 +29,7 @@ namespace ICL.GH.GhComponents
         {
         }
 
-        protected override System.Drawing.Bitmap Icon
-        {
-            get
-            {
-                return null;
-            }
-        }
+        protected override System.Drawing.Bitmap Icon => Properties.Resources.SimpleAddBeh_icn;
         public override GH_Exposure Exposure => GH_Exposure.tertiary;
         public override Guid ComponentGuid => new Guid("{58B3CAA5-DDC8-4EE0-A756-05C778A8F52D}");
 

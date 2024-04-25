@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Rhino.Geometry;
 using ICL.Core.Utilities;
-using ICL.Core.Utilities;
 using Karamba.Geometry;
 using Karamba.Models;
 

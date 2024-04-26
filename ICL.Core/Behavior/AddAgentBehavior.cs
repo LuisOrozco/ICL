@@ -3,7 +3,6 @@ using ABxM.Core.AgentSystem;
 using ABxM.Core.Behavior;
 using ABxM.Core.Environments;
 using ICL.Core.AgentSystem;
-using ICL.Core.Utilities;
 using Karamba.Elements;
 using Karamba.Geometry;
 using Karamba.GHopper.Geometry;

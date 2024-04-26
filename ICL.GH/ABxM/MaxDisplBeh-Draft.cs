@@ -34,11 +34,6 @@ using ABxM.Core.Utilities;
 using ICL.Core;
 using ICL.Core.Behavior;
 using ICL.Core.AgentSystem;
-using ICL.Core.Environments;
-using ICL.Core;
-using ICL.Core.Utilities;
-using ICL.Core.Utilities;
-using ICL.Core.Utilities;
 
 using Karamba;
 using Karamba.CrossSections;

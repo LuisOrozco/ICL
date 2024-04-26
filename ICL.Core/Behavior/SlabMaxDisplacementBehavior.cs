@@ -9,7 +9,6 @@ using ABxM.Core.Agent;
 using ABxM.Core.Environments;
 
 using ICL.Core.AgentSystem;
-using ICL.Core.Environments;
 using Rhino.Geometry;
 using Rhino;
 using Karamba.GHopper.Geometry;

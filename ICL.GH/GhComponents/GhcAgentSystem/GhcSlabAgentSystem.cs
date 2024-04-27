@@ -12,10 +12,14 @@ using Karamba.Elements;
 using Karamba.Supports;
 using Karamba.Loads;
 using System.Linq;
+using Karamba.Geometry;
 using Karamba.GHopper.Elements;
+using Karamba.GHopper.Geometry;
 using Karamba.GHopper.Supports;
 using Karamba.GHopper.Loads;
 using Rhino.Geometry;
+using ICL.GH.Properties;
+using System.ComponentModel;
 
 
 namespace ICL.GH.GhComponents
@@ -51,6 +55,8 @@ namespace ICL.GH.GhComponents
             pManager.AddGenericParameter("Load", "Load", "Input loads", GH_ParamAccess.list);
             pManager.AddCurveParameter("Exclusion Curves", "Excl", "Curves describing the column exclusion zones", GH_ParamAccess.list) ;
             pManager[6].Optional = true;
+            pManager.AddNumberParameter("Displacement Threshold", "T", "Displacement Threshold in mm", GH_ParamAccess.item,10);
+
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
@@ -94,6 +100,10 @@ namespace ICL.GH.GhComponents
 
             List<Curve> iExcl = new List<Curve>();
             DA.GetDataList(6, iExcl);
+
+            // Pull from inputs into internal variables
+            double iDisplacementThreshold = 0;
+            DA.GetData(7, ref iDisplacementThreshold);
 
             // check if agents changed
             bool inputsChanged = false;
@@ -140,7 +150,8 @@ namespace ICL.GH.GhComponents
                     ModelElements = iModelElements,
                     ConstantSupports = iSupports,
                     Loads = iLoads,
-                    ExclusionCurves = iExcl
+                    ExclusionCurves = iExcl,
+                    DisplacementThreshold = iDisplacementThreshold
                 };
             }
 
@@ -149,6 +160,21 @@ namespace ICL.GH.GhComponents
             agentSystem.ConstantSupports = iSupports;
             agentSystem.Loads = iLoads;
             agentSystem.ExclusionCurves = iExcl;
+            agentSystem.DisplacementThreshold = iDisplacementThreshold;
+
+            //// Find indexes of vertixes inside the no column zones
+
+            Mesh SlabGeo = ((Mesh3)((BuilderShell)agentSystem.ModelElements[0]).mesh).Convert();
+            for (int i = 0; i < SlabGeo.Vertices.Count; i++)
+            {
+                foreach (Curve exclCurve in agentSystem.ExclusionCurves)
+                {
+                    if (exclCurve.Contains(SlabGeo.Vertices[i], Plane.WorldXY, 0.01) == PointContainment.Inside)
+                    {
+                        agentSystem.ExclusionIndices.Add(i);
+                    }
+                }
+            }
 
             if (iDiagram == 0 || iDiagram > 2)
             {
@@ -172,15 +198,8 @@ namespace ICL.GH.GhComponents
         /// <summary>
         /// Provides an Icon for the component.
         /// </summary>
-        protected override System.Drawing.Bitmap Icon
-        {
-            get
-            {
-                //You can add image files to your project resources and access them like this:
-                // return Resources.IconForThisComponent;
-                return null;
-            }
-        }
+        protected override System.Drawing.Bitmap Icon =>  Properties.Resources.ICLSystem_icn;
+
         public override GH_Exposure Exposure => GH_Exposure.primary;
 
         /// <summary>

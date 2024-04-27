@@ -49,7 +49,7 @@
       <HintPath>..\packages\KarambaCommon.2.2.0.144\lib\net48\KarambaCommon.dll</HintPath>
     </Reference>
     <Reference Include="karambaGH">
-      <HintPath>..\..\..\..\..\..\Program Files\Rhino 7\Plug-ins\Karamba\karambaGH.dll</HintPath>
+      <HintPath>..\..\..\..\AppData\Roaming\McNeel\Rhinoceros\packages\7.0\Karamba3D\2.2.0.180\karambaGH.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -81,18 +81,8 @@
     <Compile Include="Behavior\AddAgentBehavior.cs" />
     <Compile Include="Behavior\RemoveAgentBehavior.cs" />
     <Compile Include="Behavior\SlabMaxDisplacementBehavior.cs" />
-    <Compile Include="AgentSystem\ICLBeamAgentSystem.cs" />
     <Compile Include="AgentSystem\ICLSlabAgentSystem.cs" />
-    <Compile Include="Environments\ICLBeamEnvironment.cs" />
-    <Compile Include="Environments\ICLSlabEnvironment.cs" />
-    <Compile Include="Solver\BeamSolver.cs" />
-    <Compile Include="Solver\SlabSolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utilities\FEA.cs" />
-    <Compile Include="Utilities\BeamFEM.cs" />
-    <Compile Include="Utilities\SlabFEM.cs" />
-    <Compile Include="Agent\BeamInitializeAgents.cs" />
-    <Compile Include="Agent\SlabInitializeAgents.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

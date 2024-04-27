@@ -6,7 +6,7 @@
     <Title>ICL.GH</Title>
     <Description>Description of ICL.GH</Description>
     <TargetExt>.gha</TargetExt>
-    <BaseOutputPath>C:\Users\ukeer\GitHub\ICL\ICL.GH\bin\Debug\net48\Debug\net452</BaseOutputPath>
+    <BaseOutputPath>bin\</BaseOutputPath>
   </PropertyGroup>
 	
   <ItemGroup>
@@ -16,7 +16,10 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Grasshopper" Version="6.35.21222.17001" IncludeAssets="compile;build" />
+    <PackageReference Include="ABxM.Core" Version="1.5.4" />
+    <PackageReference Include="Grasshopper" Version="7.35.23346.11001" IncludeAssets="compile;build" />
+    <PackageReference Include="KarambaCommon" Version="2.2.0.144" />
+    <PackageReference Include="RhinoCommon" Version="7.35.23346.11001" />
   </ItemGroup>
   
   <ItemGroup>
@@ -24,15 +27,48 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Reference Include="ICD.AbmFramework.Core">
-      <HintPath>..\..\..\AppData\Roaming\Grasshopper\Libraries\ICD.AbmFramework.Core.dll</HintPath>
+    <Reference Include="Karamba3D">
+      <HintPath>..\..\..\..\AppData\Roaming\McNeel\Rhinoceros\packages\7.0\Karamba3D\2.2.0.180\karambaGH.dll</HintPath>
     </Reference>
-    <Reference Include="ICL.Core">
-      <HintPath>..\ICL.Core\bin\Debug\ICL.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="KarambaCommon">
-      <HintPath>..\..\..\AppData\Roaming\McNeel\Rhinoceros\packages\7.0\Karamba3D\2.2.0.12\KarambaCommon.dll</HintPath>
-    </Reference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="Resources\AddBeh_icn.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\ICLSystem_icn.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\ICLViz_icn.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\MaxDisplBeh_icn.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\RemoveBeh_icn.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\SegBeh_icn.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\SimpleAddBeh_icn.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   
   <PropertyGroup Condition="$(Configuration) == 'Debug' AND $([MSBuild]::IsOSPlatform(Windows))">
@@ -48,5 +84,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <Optimize>False</Optimize>
   </PropertyGroup>
+  
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="Copy &quot;$(TargetPath)&quot; &quot;$(AppData)\Grasshopper\Libraries\ICL.gha&quot;" />
+  </Target>
 
 </Project>
